@@ -1,50 +1,100 @@
-# BagiPromo - Kalkulator Patungan Diskon Makanan (Gojek / Grab / ShopeeFood)
+# BagiPromo - Kalkulator Patungan Diskon Makanan
 
-Aplikasi web mobile-first untuk menghitung pembagian patungan diskon makanan secara proporsional dan adil saat pesan bareng di GoFood, GrabFood, atau ShopeeFood.
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![Framework: Alpine.js](https://img.shields.io/badge/Alpine.js-3.14-8bc0d0.svg)](https://alpinejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38bdf8.svg)](https://tailwindcss.com/)
+[![OCR: Tesseract.js](https://img.shields.io/badge/OCR-Tesseract.js-5c6ac4.svg)](https://tesseract.projectnaptha.com/)
 
-## ✨ Fitur Utama
-- **Mobile-First & Responsif**: Nyaman diakses di layar smartphone maupun desktop dengan tap target lega.
-- **Keyboard Numeric**: Mengaktifkan numpad langsung di HP (`inputmode="numeric"`).
-- **Format Rupiah Otomatis**: Pemisah ribuan otomatis saat mengetik.
-- **Auto-Fill Struk**: Tombol cepat untuk mengisi "Total Sebelum Diskon" langsung dari akumulasi harga menu.
-- **Koreksi Selisih Pembulatan (Pas-kan)**: Fitur 1-klik untuk menyerap selisih pembulatan (Rp 1 - Rp 5) ke salah satu item agar total pas 100%.
-- **Bagikan ke WhatsApp**: Menghasilkan format pesan rapi beserta tujuan rekening/e-wallet untuk langsung dikirim ke grup chat.
-- **Riwayat Akumulasi**: Melacak total tagihan dan diskon yang pernah dihitung secara otomatis.
-- **LocalStorage Auto-Save**: Data tersimpan otomatis dan tidak hilang saat halaman browser direfresh atau tertutup.
-- **Data Contoh**: Tombol demo cepat untuk mencoba simulasi.
+Aplikasi web mobile-first (~15 kB JS) untuk menghitung pembagian patungan diskon makanan secara proporsional saat memesan bersama di GoFood, GrabFood, atau ShopeeFood. Dilengkapi pemindai struk (OCR) langsung di browser tanpa server pemrosesan tambahan.
 
 ---
 
-## 🐳 Deployment via Docker (Server)
+## Fitur
 
-### 1. Jalankan via Docker Compose (Rekomendasi)
+### 1. Pindai Struk (Client-Side OCR)
+- **Kamera Langsung**: Di smartphone, langsung membuka kamera belakang (`capture="environment"`).
+- **Galeri & Berkas**: Mendukung unggahan foto struk fisik atau tangkapan layar (screenshot) aplikasi delivery.
+- **Ekstraksi Data**: Mengurai teks struk untuk mendeteksi Subtotal, Total Akhir, dan daftar menu makanan.
+- **Verifikasi Sebelum Diterapkan**: Modal peninjauan hasil pembacaan struk dengan input masking Rupiah real-time.
+- **Gratis & Lokal**: Menggunakan Tesseract.js yang diproses 100% di browser pengguna tanpa pengiriman berkas ke server eksternal.
+
+### 2. Perhitungan Proporsional
+- **Diskon Proporsional**: Diskon dihitung berdasarkan persentase nominal belanja tiap orang, bukan dibagi rata (split equal).
+- **Auto-Fill Nilai Struk**: Tombol untuk menyamakan total struk dengan akumulasi nominal menu.
+- **Koreksi Pembulatan (Pas-kan)**: Menyesuaikan selisih pembulatan (Rp 1 – Rp 5) ke item pertama agar total bagi hasil tepat sama dengan total bayar.
+- **Indikator Hemat**: Menampilkan persentase diskon efektif dan nominal yang dihemat.
+
+### 3. Antarmuka & UX
+- **Input Masking Rupiah**: Pemisah ribuan titik otomatis saat mengetik (`Rp 66.000`) dengan keyboard `numeric` di perangkat mobile.
+- **Reset Terarah**: Mengosongkan data kalkulasi tanpa menghapus teks rekening/info pembayaran.
+- **Penyimpanan Lokal**: Data tersimpan otomatis di `localStorage` peramban.
+- **Sticky Bar**: Rangkuman total dan tombol aksi tetap terlihat di bagian bawah layar smartphone.
+
+### 4. Ekspor & Pembagian
+- **Teks WhatsApp**: Format pesan teks terstruktur per orang beserta rincian rekening tujuan transfer.
+- **Ekspor Gambar**: Mengonversi rincian patungan menjadi gambar struk (.png) via `html2canvas`.
+
+---
+
+## Teknologi
+
+| Komponen | Pilihan | Keterangan |
+|---|---|---|
+| **Logic** | [Alpine.js 3.x](https://alpinejs.dev/) | Reaktif, deklaratif, tanpa build step |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) | Utilitas CSS responsif |
+| **OCR Engine** | [Tesseract.js](https://tesseract.projectnaptha.com/) | Multi-bahasa (`ind+eng`), WebAssembly |
+| **Receipt Export** | [html2canvas](https://html2canvas.hertzen.com/) | Render elemen DOM ke kanvas gambar |
+| **Interaksi** | Canvas Confetti | Notifikasi visual |
+
+---
+
+## SEO & Metadata
+
+- **Metadata**: Title, description, keywords, dan canonical URL terstruktur.
+- **Open Graph & Twitter Cards**: Pratinjau tautan untuk WhatsApp, Telegram, dan media sosial.
+- **Schema.org (JSON-LD)**: Format terstruktur `WebApplication` tipe `FinanceApplication`.
+
+---
+
+## Menjalankan dengan Docker
+
+### 1. Docker Compose
 ```bash
 docker compose up -d --build
 ```
-Aplikasi akan aktif di port `8080` (atau ubah via env `PORT=3000 docker compose up -d`).
+Port default: `8080` (dapat disesuaikan via variabel `PORT`).
 
-### 2. Jalankan via Docker CLI
+### 2. Docker CLI
 ```bash
-# Build image
-docker build -t calculator-discount .
+# Build image Nginx
+docker build -t bagi-promo .
 
-# Jalankan container (port 80 host -> port 80 container)
-docker run -d --name calculator-discount -p 80:80 --restart unless-stopped calculator-discount
+# Jalankan container
+docker run -d --name bagi-promo-app -p 80:80 --restart unless-stopped bagi-promo
 ```
 
-### 3. Cek Status Container
+### 3. Log Container
 ```bash
-docker ps
-# Cek log
-docker logs -f calculator-discount-app
+docker logs -f bagi-promo-app
 ```
 
 ---
 
-## 💻 Cara Menjalankan Lokal (Tanpa Docker)
-Buka file `index.html` langsung di browser, atau jalankan menggunakan live server:
+## Menjalankan Lokal
+
+Jalankan HTTP server sederhana dari direktori proyek:
 
 ```bash
+# Python 3
 python3 -m http.server 3000
-# atau npx serve .
+
+# Atau npx
+npx serve .
 ```
+
+Akses melalui `http://localhost:3000`.
+
+---
+
+## Lisensi
+[MIT](LICENSE)
