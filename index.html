@@ -12,8 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Vue 3 & Tailwind CSS CDN -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- Alpine.js & Tailwind CSS CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Canvas Confetti for celebrate -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -44,7 +44,7 @@
     </script>
 
     <style>
-        [v-cloak] { display: none !important; }
+        [x-cloak] { display: none !important; }
         
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -68,30 +68,6 @@
             border-radius: 9999px;
         }
 
-        /* Transition animations */
-        .list-move,
-        .list-enter-active,
-        .list-leave-active {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .list-enter-from,
-        .list-leave-to {
-            opacity: 0;
-            transform: translateY(12px) scale(0.98);
-        }
-        .list-leave-active {
-            position: absolute;
-            width: 100%;
-        }
-
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        .fade-enter-from, .fade-leave-to {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
         /* Safe area for mobile home indicators */
         .safe-bottom {
             padding-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -100,7 +76,7 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-700">
 
-    <div id="app" v-cloak class="flex-1 flex flex-col pb-20 sm:pb-24">
+    <div id="app" x-data="calculator()" x-cloak class="flex-1 flex flex-col pb-20 sm:pb-24">
         
         <!-- Top App Bar -->
         <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
@@ -116,7 +92,7 @@
                     <div>
                         <div class="flex items-center gap-1.5">
                             <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">BagiPromo</h1>
-                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-brand-100 text-brand-700">v2.0</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-brand-100 text-brand-700">Alpine.js</span>
                         </div>
                         <p class="text-xs text-slate-500 font-medium">Bagi Tagihan & Diskon Makanan Adil</p>
                     </div>
@@ -152,15 +128,17 @@
                         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700">Parameter Struk Pesanan</h2>
                     </div>
 
-                    <div v-if="sumMenuPrices > 0" class="flex items-center gap-2">
-                        <button 
-                            @click="applySumAsOriginalPrice"
-                            type="button"
-                            class="text-xs text-brand-600 hover:text-brand-700 font-semibold bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-md transition flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Gunakan Total Menu (Rp {{ formatNumber(sumMenuPrices) }})
-                        </button>
-                    </div>
+                    <template x-if="sumMenuPrices > 0">
+                        <div class="flex items-center gap-2">
+                            <button 
+                                @click="applySumAsOriginalPrice"
+                                type="button"
+                                class="text-xs text-brand-600 hover:text-brand-700 font-semibold bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-md transition flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Gunakan Total Menu (Rp <span x-text="formatNumber(sumMenuPrices)"></span>)</span>
+                            </button>
+                        </div>
+                    </template>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -178,7 +156,7 @@
                                 id="total_price"
                                 type="text"
                                 inputmode="numeric"
-                                v-model="state.total_price"
+                                x-model="state.total_price"
                                 placeholder="Contoh: 120.000"
                                 @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_price')"
@@ -201,7 +179,7 @@
                                 id="total_ammount"
                                 type="text"
                                 inputmode="numeric"
-                                v-model="state.total_ammount"
+                                x-model="state.total_ammount"
                                 placeholder="Contoh: 75.000"
                                 @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_ammount')"
@@ -212,29 +190,31 @@
                 </div>
 
                 <!-- Live Saving Stats Banner -->
-                <div v-if="isValidParameters" class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-xs font-semibold text-emerald-900">Total Penghematan Diskon</div>
-                            <div class="text-sm font-extrabold text-emerald-700">
-                                Hemat Rp {{ formatNumber(totalDiscountAmount) }}
-                                <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-200/80 text-emerald-800 ml-1">
-                                    {{ discountPercentage }}% OFF
-                                </span>
+                <template x-if="isValidParameters">
+                    <div class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-emerald-900">Total Penghematan Diskon</div>
+                                <div class="text-sm font-extrabold text-emerald-700">
+                                    <span>Hemat Rp <span x-text="formatNumber(totalDiscountAmount)"></span></span>
+                                    <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-200/80 text-emerald-800 ml-1">
+                                        <span x-text="discountPercentage"></span>% OFF
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="text-right text-xs text-slate-500 font-medium">
-                        Rasio Bayar: <span class="font-bold text-slate-700">{{ payRatioPercent }}%</span> dari harga menu
+                        <div class="text-right text-xs text-slate-500 font-medium">
+                            Rasio Bayar: <span class="font-bold text-slate-700"><span x-text="payRatioPercent"></span>%</span> dari harga menu
+                        </div>
                     </div>
-                </div>
+                </template>
             </section>
 
             <!-- Menu / Pemesan Section -->
@@ -245,27 +225,24 @@
                         <p class="text-xs text-slate-400">Tiap orang bayar proporsional sesuai porsi diskon</p>
                     </div>
                     <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
-                        {{ state.persons.length }} Menu
+                        <span x-text="state.persons.length"></span> Menu
                     </span>
                 </div>
 
                 <!-- Cards List -->
                 <div class="relative space-y-3">
-                    <transition-group name="list">
-                        <div 
-                            v-for="(person, idx) in state.persons" 
-                            :key="person.id"
-                            class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-sm hover:border-slate-300 hover:shadow-md transition-all group relative">
+                    <template x-for="(person, idx) in state.persons" :key="person.id">
+                        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-sm hover:border-slate-300 hover:shadow-md transition-all group relative">
                             
                             <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                                 <!-- Nomor urut & Nama Pemesan -->
                                 <div class="flex items-center gap-2 flex-1 min-w-[140px]">
                                     <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center shrink-0">
-                                        {{ idx + 1 }}
+                                        <span x-text="idx + 1"></span>
                                     </div>
                                     <input 
                                         type="text" 
-                                        v-model="person.name" 
+                                        x-model="person.name" 
                                         :placeholder="'Nama / Menu ' + (idx + 1)"
                                         class="w-full px-3 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-300 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-slate-300 rounded-lg outline-none transition"
                                     >
@@ -278,7 +255,7 @@
                                         <input 
                                             type="text"
                                             inputmode="numeric"
-                                            v-model="person.price"
+                                            x-model="person.price"
                                             placeholder="Harga menu"
                                             @keypress="numberOnly($event)"
                                             @input="onFormatInput($event, person, 'price')"
@@ -297,31 +274,38 @@
                                     <div class="flex flex-col">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700/80">Bayar Bersih</span>
                                         <div class="text-base sm:text-lg font-extrabold text-emerald-800 leading-tight">
-                                            <span v-if="isValidParameters && person.price">Rp {{ formatNumber(calculatePersonShare(person)) }}</span>
-                                            <span v-else class="text-slate-300 font-semibold text-sm">-</span>
+                                            <template x-if="isValidParameters && person.price">
+                                                <span>Rp <span x-text="formatNumber(calculatePersonShare(person))"></span></span>
+                                            </template>
+                                            <template x-if="!isValidParameters || !person.price">
+                                                <span class="text-slate-300 font-semibold text-sm">-</span>
+                                            </template>
                                         </div>
                                     </div>
 
                                     <!-- Hemat Badge -->
-                                    <div v-if="isValidParameters && person.price && calculatePersonSaving(person) > 0" class="text-right sm:ml-auto">
-                                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
-                                            Hemat Rp {{ formatNumber(calculatePersonSaving(person)) }}
-                                        </span>
-                                    </div>
+                                    <template x-if="isValidParameters && person.price && calculatePersonSaving(person) > 0">
+                                        <div class="text-right sm:ml-auto">
+                                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
+                                                Hemat Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span>
+                                            </span>
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <!-- Delete button -->
-                                <button 
-                                    v-if="state.persons.length > 1"
-                                    @click="removeRow(idx)" 
-                                    type="button" 
-                                    class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90 self-end sm:self-center shrink-0" 
-                                    title="Hapus baris">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
+                                <template x-if="state.persons.length > 1">
+                                    <button 
+                                        @click="removeRow(idx)" 
+                                        type="button" 
+                                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90 self-end sm:self-center shrink-0" 
+                                        title="Hapus baris">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </template>
                             </div>
                         </div>
-                    </transition-group>
+                    </template>
                 </div>
 
                 <!-- Tombol Tambah Menu -->
@@ -337,62 +321,67 @@
             </section>
 
             <!-- Rekapitulasi & Validasi Selisih -->
-            <section v-if="isValidParameters" class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Status Validasi & Pembulatan</h3>
-                    <span 
-                        :class="roundingDifference === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
-                        class="text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full" :class="roundingDifference === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
-                        {{ roundingDifference === 0 ? 'Pas 100%' : 'Ada Selisih Pembulatan' }}
-                    </span>
-                </div>
+            <template x-if="isValidParameters">
+                <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Status Validasi & Pembulatan</h3>
+                        <span 
+                            :class="roundingDifference === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
+                            class="text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full" :class="roundingDifference === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                            <span x-text="roundingDifference === 0 ? 'Pas 100%' : 'Ada Selisih Pembulatan'"></span>
+                        </span>
+                    </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div class="text-[11px] font-semibold text-slate-400">Total Bayar Struk</div>
-                        <div class="text-base font-bold text-slate-800">Rp {{ formatNumber(parsedTotalAmount) }}</div>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div class="text-[11px] font-semibold text-slate-400">Total Hasil Bagi</div>
-                        <div class="text-base font-bold text-slate-800">Rp {{ formatNumber(totalAllocatedShare) }}</div>
-                    </div>
-                    <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border" :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/70 border-amber-200'">
-                        <div class="text-[11px] font-semibold" :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-700'">
-                            Selisih (Rounding)
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <div class="text-[11px] font-semibold text-slate-400">Total Bayar Struk</div>
+                            <div class="text-base font-bold text-slate-800">Rp <span x-text="formatNumber(parsedTotalAmount)"></span></div>
                         </div>
-                        <div class="text-base font-extrabold flex items-center justify-between" :class="roundingDifference === 0 ? 'text-emerald-800' : 'text-amber-900'">
-                            <span>{{ roundingDifference > 0 ? '+' : '' }}Rp {{ formatNumber(roundingDifference) }}</span>
-                            <button 
-                                v-if="roundingDifference !== 0"
-                                @click="autoFixRounding"
-                                type="button"
-                                class="text-[11px] font-bold bg-amber-200/80 hover:bg-amber-300 text-amber-900 px-2 py-0.5 rounded-md transition"
-                                title="Otomatis bulatkan selisih ke item terbesar">
-                                Pas-kan
-                            </button>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <div class="text-[11px] font-semibold text-slate-400">Total Hasil Bagi</div>
+                            <div class="text-base font-bold text-slate-800">Rp <span x-text="formatNumber(totalAllocatedShare)"></span></div>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border" :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/70 border-amber-200'">
+                            <div class="text-[11px] font-semibold" :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-700'">
+                                Selisih (Rounding)
+                            </div>
+                            <div class="text-base font-extrabold flex items-center justify-between" :class="roundingDifference === 0 ? 'text-emerald-800' : 'text-amber-900'">
+                                <span><span x-text="roundingDifference > 0 ? '+' : ''"></span>Rp <span x-text="formatNumber(roundingDifference)"></span></span>
+                                <template x-if="roundingDifference !== 0">
+                                    <button 
+                                        @click="autoFixRounding"
+                                        type="button"
+                                        class="text-[11px] font-bold bg-amber-200/80 hover:bg-amber-300 text-amber-900 px-2 py-0.5 rounded-md transition"
+                                        title="Otomatis bulatkan selisih ke item terbesar">
+                                        Pas-kan
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <p v-if="roundingDifference !== 0" class="text-xs text-amber-700/90 leading-relaxed">
-                    💡 <em>Selisih Rp {{ Math.abs(roundingDifference) }} terjadi karena pembulatan ke Rupiah terdekat. Klik tombol <b>"Pas-kan"</b> untuk otomatis menyerap selisih ke item pertama.</em>
-                </p>
-            </section>
+                    <template x-if="roundingDifference !== 0">
+                        <p class="text-xs text-amber-700/90 leading-relaxed">
+                            💡 <em>Selisih Rp <span x-text="Math.abs(roundingDifference)"></span> terjadi karena pembulatan ke Rupiah terdekat. Klik tombol <b>"Pas-kan"</b> untuk otomatis menyerap selisih ke item pertama.</em>
+                        </p>
+                    </template>
+                </section>
+            </template>
 
             <!-- Card Rekening / Info Pembayaran -->
             <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <label for="payment_info" class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                        Tujuan Transfer / Info Pembayaran (Opsional)
+                        <svg class="w-4 h-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="10" y1="10" x2="23" y2="10"></line></svg>
+                        <span>Tujuan Transfer / Info Pembayaran (Opsional)</span>
                     </label>
                     <span class="text-[11px] text-slate-400">Masuk ke teks WA</span>
                 </div>
                 <input 
                     id="payment_info"
                     type="text" 
-                    v-model="state.payment_info" 
+                    x-model="state.payment_info" 
                     placeholder="Contoh: BCA 1234567890 a.n Budi / GoPay 08123456789"
                     class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition"
                 >
@@ -415,7 +404,7 @@
 
                     <div class="flex items-center gap-1.5">
                         <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-700/50 px-2.5 py-0.5 rounded-full">
-                            {{ stats.count || 1 }}x Dihitung
+                            <span x-text="stats.count || 1"></span>x Dihitung
                         </span>
                     </div>
                 </div>
@@ -427,17 +416,17 @@
                             <span>Total Tagihan Dihitung</span>
                         </div>
                         <div class="text-base sm:text-lg font-black text-white mt-1">
-                            Rp {{ formatNumber(stats.totalBilled) }}
+                            Rp <span x-text="formatNumber(stats.totalBilled)"></span>
                         </div>
                     </div>
 
                     <div class="bg-emerald-950/40 rounded-xl p-3 border border-emerald-800/50 flex flex-col justify-between">
                         <div class="text-[11px] font-medium text-emerald-400 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                             <span>Total Diskon Dihemat</span>
                         </div>
                         <div class="text-base sm:text-lg font-black text-emerald-400 mt-1">
-                            Rp {{ formatNumber(stats.totalSaved) }}
+                            Rp <span x-text="formatNumber(stats.totalSaved)"></span>
                         </div>
                     </div>
                 </div>
@@ -451,7 +440,7 @@
                 <div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Ditagih</span>
                     <div class="text-lg sm:text-xl font-black text-slate-900 leading-tight">
-                        Rp {{ formatNumber(parsedTotalAmount || 0) }}
+                        Rp <span x-text="formatNumber(parsedTotalAmount || 0)"></span>
                     </div>
                 </div>
 
@@ -472,210 +461,226 @@
         </footer>
 
         <!-- Modal WhatsApp Share & Rincian -->
-        <transition name="fade">
-            <div v-if="showShareModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
-                <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in">
-                    <!-- WhatsApp Header Mockup -->
-                    <div class="bg-[#075E54] px-4 py-3 text-white flex items-center justify-between shrink-0 shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-inner shrink-0">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm leading-tight flex items-center gap-1.5">
-                                    <span>Patungan Makan</span>
-                                    <span class="text-[10px] bg-emerald-700/80 px-1.5 py-0.2 rounded text-emerald-200">Grup</span>
-                                </h3>
-                                <p class="text-[11px] text-emerald-100/80">Online • Siap dibagikan ke WhatsApp</p>
-                            </div>
+        <div 
+            x-show="showShareModal" 
+            x-transition.opacity.duration.200ms
+            class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
+            <div 
+                @click.outside="showShareModal = false"
+                class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+                <!-- WhatsApp Header Mockup -->
+                <div class="bg-[#075E54] px-4 py-3 text-white flex items-center justify-between shrink-0 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-inner shrink-0">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                         </div>
-
-                        <div class="flex items-center gap-1">
-                            <button 
-                                @click="showShareModal = false" 
-                                type="button" 
-                                class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition"
-                                title="Tutup">
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
+                        <div>
+                            <h3 class="font-bold text-sm leading-tight flex items-center gap-1.5">
+                                <span>Patungan Makan</span>
+                                <span class="text-[10px] bg-emerald-700/80 px-1.5 py-0.2 rounded text-emerald-200">Grup</span>
+                            </h3>
+                            <p class="text-[11px] text-emerald-100/80">Online • Siap dibagikan ke WhatsApp</p>
                         </div>
                     </div>
 
-                    <!-- Tab Switcher: Teks WhatsApp vs Gambar Struk -->
-                    <div class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
-                        <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200/70 w-full sm:w-auto">
-                            <button 
-                                type="button"
-                                @click="shareTab = 'text'" 
-                                :class="shareTab === 'text' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                                class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
-                                <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                <span>Text</span>
-                            </button>
-                            <button 
-                                type="button"
-                                @click="shareTab = 'image'" 
-                                :class="shareTab === 'image' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                                class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
-                                <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                <span>Gambar</span>
-                            </button>
-                        </div>
+                    <div class="flex items-center gap-1">
+                        <button 
+                            @click="showShareModal = false" 
+                            type="button" 
+                            class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition"
+                            title="Tutup">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Modal Body / Content -->
-                    <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
-                        
-                        <!-- TAB 1: Teks WhatsApp Preview (PERSIS sama seperti yang disalin) -->
-                        <div v-show="shareTab === 'text'" class="space-y-2.5">
-                            <div class="text-xs px-1 font-semibold text-slate-700">
-                                Pratinjau Pesan Chat WhatsApp:
-                            </div>
+                <!-- Tab Switcher: Teks WhatsApp vs Gambar Struk -->
+                <div class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
+                    <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200/70 w-full sm:w-auto">
+                        <button 
+                            type="button"
+                            @click="shareTab = 'text'" 
+                            :class="shareTab === 'text' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                            class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>Text</span>
+                        </button>
+                        <button 
+                            type="button"
+                            @click="shareTab = 'image'" 
+                            :class="shareTab === 'image' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                            class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <span>Gambar</span>
+                        </button>
+                    </div>
+                </div>
 
-                            <div class="flex justify-end">
-                                <div class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
-                                    
-                                    <div class="font-bold text-slate-950 text-sm">*RINCIAN PATUNGAN MAKANAN*</div>
-                                    <div class="text-slate-400 text-xs font-mono">─────────────────────────────</div>
+                <!-- Modal Body / Content -->
+                <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
+                    
+                    <!-- TAB 1: Teks WhatsApp Preview (PERSIS sama seperti yang disalin) -->
+                    <div x-show="shareTab === 'text'" class="space-y-2.5">
+                        <div class="text-xs px-1 font-semibold text-slate-700">
+                            Pratinjau Pesan Chat WhatsApp:
+                        </div>
 
-                                    <!-- Ringkasan Tagihan -->
-                                    <div v-if="parsedTotalPrice && parsedTotalAmount" class="space-y-0.5 text-xs text-slate-800">
+                        <div class="flex justify-end">
+                            <div class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
+                                
+                                <div class="font-bold text-slate-950 text-sm">*RINCIAN PATUNGAN MAKANAN*</div>
+                                <div class="text-slate-400 text-xs font-mono">─────────────────────────────</div>
+
+                                <!-- Ringkasan Tagihan -->
+                                <template x-if="parsedTotalPrice && parsedTotalAmount">
+                                    <div class="space-y-0.5 text-xs text-slate-800">
                                         <div class="font-bold text-slate-950">*Ringkasan Tagihan:*</div>
-                                        <div>• Total Menu Asli : Rp {{ formatNumber(parsedTotalPrice) }}</div>
-                                        <div>• Total Dibayar   : <strong class="font-bold text-slate-950">Rp {{ formatNumber(parsedTotalAmount) }}</strong></div>
-                                        <div>• Hemat Diskon    : <strong class="font-bold text-emerald-800">Rp {{ formatNumber(totalDiscountAmount) }} ({{ discountPercentage }}% OFF)</strong></div>
+                                        <div>• Total Menu Asli : Rp <span x-text="formatNumber(parsedTotalPrice)"></span></div>
+                                        <div>• Total Dibayar   : <strong class="font-bold text-slate-950">Rp <span x-text="formatNumber(parsedTotalAmount)"></span></strong></div>
+                                        <div>• Hemat Diskon    : <strong class="font-bold text-emerald-800">Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span x-text="discountPercentage"></span>% OFF)</strong></div>
                                         <div class="text-slate-400 text-xs font-mono pt-0.5">─────────────────────────────</div>
                                     </div>
+                                </template>
 
-                                    <!-- Per orang -->
-                                    <div class="space-y-2 text-xs text-slate-800">
-                                        <div class="font-bold text-slate-950">*Rincian Bayar per Orang:*</div>
-                                        <div v-for="(person, idx) in activePersons" :key="person.id" class="pl-1">
-                                            <div class="font-bold text-slate-950">{{ idx + 1 }}. *{{ person.name || ('Orang ' + (idx + 1)) }}*</div>
-                                            <div class="text-slate-600 text-[11px] font-mono whitespace-pre">   ├ Harga Menu : Rp {{ formatNumber(person.price) }}</div>
-                                            <div v-if="calculatePersonSaving(person) > 0" class="text-emerald-800 text-[11px] font-mono whitespace-pre">   ├ Diskon     : Rp {{ formatNumber(calculatePersonSaving(person)) }}</div>
-                                            <div class="font-bold text-emerald-950 text-xs font-mono whitespace-pre">   └ *Bayar      : Rp {{ formatNumber(calculatePersonShare(person)) }}*</div>
+                                <!-- Per orang -->
+                                <div class="space-y-2 text-xs text-slate-800">
+                                    <div class="font-bold text-slate-950">*Rincian Bayar per Orang:*</div>
+                                    <template x-for="(person, idx) in activePersons" :key="person.id">
+                                        <div class="pl-1">
+                                            <div class="font-bold text-slate-950"><span x-text="idx + 1"></span>. *<span x-text="person.name || ('Orang ' + (idx + 1))"></span>*</div>
+                                            <div class="text-slate-600 text-[11px] font-mono whitespace-pre">   ├ Harga Menu : Rp <span x-text="formatNumber(person.price)"></span></div>
+                                            <template x-if="calculatePersonSaving(person) > 0">
+                                                <div class="text-emerald-800 text-[11px] font-mono whitespace-pre">   ├ Diskon     : Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span></div>
+                                            </template>
+                                            <div class="font-bold text-emerald-950 text-xs font-mono whitespace-pre">   └ *Bayar      : Rp <span x-text="formatNumber(calculatePersonShare(person))"></span>*</div>
                                         </div>
-                                    </div>
+                                    </template>
+                                </div>
 
-                                    <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
-                                    <div class="font-bold text-slate-950 text-xs">
-                                        *TOTAL DITAGIH : Rp {{ formatNumber(totalAllocatedShare) }}*
-                                    </div>
+                                <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
+                                <div class="font-bold text-slate-950 text-xs">
+                                    *TOTAL DITAGIH : Rp <span x-text="formatNumber(totalAllocatedShare)"></span>*
+                                </div>
 
-                                    <!-- Norek section -->
-                                    <div v-if="state.payment_info" class="pt-1 text-xs">
+                                <!-- Norek section -->
+                                <template x-if="state.payment_info">
+                                    <div class="pt-1 text-xs">
                                         <div class="text-slate-400 text-xs font-mono pb-1">─────────────────────────────</div>
                                         <div class="font-bold text-slate-950">*Info Pembayaran / Transfer:*</div>
-                                        <div class="mt-1 bg-white/80 p-2 rounded-lg font-mono text-xs select-all border border-emerald-600/10">
-                                            {{ state.payment_info }}
+                                        <div class="mt-1 bg-white/80 p-2 rounded-lg font-mono text-xs select-all border border-emerald-600/10" x-text="state.payment_info">
                                         </div>
                                     </div>
+                                </template>
 
-                                    <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
-                                    <div class="text-[11px] text-slate-600 flex items-center justify-between pt-0.5">
-                                        <div class="truncate">
-                                            <span class="text-slate-600 italic">Dihitung via: </span>
-                                            <span class="text-emerald-800 underline font-medium">{{ currentAppUrl }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-1 text-[10px] text-slate-400 shrink-0">
-                                            <span>{{ currentClock }}</span>
-                                            <span class="text-sky-500 font-bold">✓✓</span>
-                                        </div>
+                                <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
+                                <div class="text-[11px] text-slate-600 flex items-center justify-between pt-0.5">
+                                    <div class="truncate">
+                                        <span class="text-slate-600 italic">Dihitung via: </span>
+                                        <span class="text-emerald-800 underline font-medium" x-text="currentAppUrl"></span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 2: Gambar Struk Card (Siap Diekspor PNG) -->
-                        <div v-show="shareTab === 'image'" class="space-y-2.5">
-                            <div class="text-xs px-1 font-semibold text-slate-700">
-                                Pratinjau Foto Struk:
-                            </div>
-
-                            <div class="flex justify-end">
-                                <div id="receipt-card" class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl p-4 pb-5 shadow-sm text-xs sm:text-sm font-sans space-y-2.5 border border-emerald-200/60 leading-relaxed relative box-border">
-                                    
-                                    <!-- Header Struk (Text murni, 100% sejajar di canvas) -->
-                                    <div class="pb-2 border-b border-emerald-600/20 text-xs sm:text-sm font-extrabold text-emerald-950 uppercase tracking-wide flex items-center gap-1.5" style="line-height: 1.4;">
-                                        <span class="text-emerald-700 text-sm sm:text-base leading-none">📄</span>
-                                        <span class="leading-none">RINCIAN PATUNGAN MAKANAN</span>
-                                    </div>
-
-                                    <div class="bg-white/85 p-3 rounded-xl border border-emerald-600/10 text-xs space-y-1.5 shadow-xs">
-                                        <div class="text-slate-500 font-medium">Ringkasan Tagihan:</div>
-                                        <div class="flex justify-between font-medium">
-                                            <span class="text-slate-700">Total Menu:</span>
-                                            <span class="font-semibold text-slate-900">Rp {{ formatNumber(parsedTotalPrice) }}</span>
-                                        </div>
-                                        <div class="flex justify-between font-bold text-emerald-800">
-                                            <span>Total Dibayar:</span>
-                                            <span>Rp {{ formatNumber(parsedTotalAmount) }}</span>
-                                        </div>
-                                        <div class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
-                                            <span>Hemat Diskon:</span>
-                                            <span>Rp {{ formatNumber(totalDiscountAmount) }} ({{ discountPercentage }}% OFF)</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="text-xs space-y-2 pt-1">
-                                        <div class="font-bold text-slate-800">Rincian Bayar per Orang:</div>
-                                        <div v-for="(person, idx) in activePersons" :key="person.id" class="bg-white/90 p-2.5 rounded-xl border border-slate-100 shadow-sm">
-                                            <div class="font-bold text-slate-900 flex items-center justify-between">
-                                                <span>{{ idx + 1 }}. {{ person.name || ('Orang ' + (idx + 1)) }}</span>
-                                                <span class="text-emerald-700 font-extrabold text-sm sm:text-base">Rp {{ formatNumber(calculatePersonShare(person)) }}</span>
-                                            </div>
-                                            <div class="text-[11px] text-slate-500 flex justify-between mt-1">
-                                                <span>Harga Menu: Rp {{ formatNumber(person.price) }}</span>
-                                                <span class="text-emerald-600 font-semibold">Hemat: Rp {{ formatNumber(calculatePersonSaving(person)) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="p-2.5 bg-emerald-600 text-white font-extrabold rounded-xl flex justify-between items-center text-xs shadow-sm">
-                                        <span>TOTAL DITAGIH</span>
-                                        <span class="text-sm sm:text-base">Rp {{ formatNumber(totalAllocatedShare) }}</span>
-                                    </div>
-
-                                    <div v-if="state.payment_info" class="p-2.5 bg-white/90 rounded-xl text-xs border border-slate-100 shadow-sm">
-                                        <div class="font-bold text-slate-700">Info Pembayaran / Transfer:</div>
-                                        <div class="font-mono text-slate-800 text-[11px] mt-0.5">{{ state.payment_info }}</div>
-                                    </div>
-
-                                    <!-- Footer Struk (Unicode murni, terjamin sejajar teks & tidak terpotong) -->
-                                    <div class="pt-2.5 pb-1 border-t border-emerald-600/15 text-[11px] sm:text-xs flex items-center justify-between gap-2" style="line-height: 1.6;">
-                                        <div class="min-w-0 py-0.5" style="line-height: 1.6;">
-                                            <span class="text-emerald-700">🔗</span>
-                                            <span class="text-slate-600 font-medium"> Dihitung via: </span>
-                                            <span class="text-emerald-800 font-semibold break-all">{{ currentAppUrl }}</span>
-                                        </div>
-                                        <div class="shrink-0 text-[10px] text-slate-400 whitespace-nowrap pl-2">
-                                            <span>{{ currentClock }}</span>
-                                            <span class="text-sky-500 font-bold ml-0.5">✓✓</span>
-                                        </div>
+                                    <div class="flex items-center gap-1 text-[10px] text-slate-400 shrink-0">
+                                        <span x-text="currentClock"></span>
+                                        <span class="text-sky-500 font-bold">✓✓</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- Modal Actions -->
-                    <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 shrink-0">
-                        <!-- Actions when in Text Tab -->
-                        <div v-if="shareTab === 'text'" class="flex flex-col sm:flex-row gap-2">
+                    <!-- TAB 2: Gambar Struk Card (Siap Diekspor PNG) -->
+                    <div x-show="shareTab === 'image'" class="space-y-2.5">
+                        <div class="text-xs px-1 font-semibold text-slate-700">
+                            Pratinjau Foto Struk:
+                        </div>
+
+                        <div class="flex justify-end">
+                            <div id="receipt-card" class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl p-4 pb-5 shadow-sm text-xs sm:text-sm font-sans space-y-2.5 border border-emerald-200/60 leading-relaxed relative box-border">
+                                
+                                <!-- Header Struk (Text murni, 100% sejajar di canvas) -->
+                                <div class="pb-2 border-b border-emerald-600/20 text-xs sm:text-sm font-extrabold text-emerald-950 uppercase tracking-wide flex items-center gap-1.5" style="line-height: 1.4;">
+                                    <span class="text-emerald-700 text-sm sm:text-base leading-none">📄</span>
+                                    <span class="leading-none">RINCIAN PATUNGAN MAKANAN</span>
+                                </div>
+
+                                <div class="bg-white/85 p-3 rounded-xl border border-emerald-600/10 text-xs space-y-1.5 shadow-xs">
+                                    <div class="text-slate-500 font-medium">Ringkasan Tagihan:</div>
+                                    <div class="flex justify-between font-medium">
+                                        <span class="text-slate-700">Total Menu:</span>
+                                        <span class="font-semibold text-slate-900">Rp <span x-text="formatNumber(parsedTotalPrice)"></span></span>
+                                    </div>
+                                    <div class="flex justify-between font-bold text-emerald-800">
+                                        <span>Total Dibayar:</span>
+                                        <span>Rp <span x-text="formatNumber(parsedTotalAmount)"></span></span>
+                                    </div>
+                                    <div class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
+                                        <span>Hemat Diskon:</span>
+                                        <span>Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span x-text="discountPercentage"></span>% OFF)</span>
+                                    </div>
+                                </div>
+
+                                <div class="text-xs space-y-2 pt-1">
+                                    <div class="font-bold text-slate-800">Rincian Bayar per Orang:</div>
+                                    <template x-for="(person, idx) in activePersons" :key="person.id">
+                                        <div class="bg-white/90 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                                            <div class="font-bold text-slate-900 flex items-center justify-between">
+                                                <span><span x-text="idx + 1"></span>. <span x-text="person.name || ('Orang ' + (idx + 1))"></span></span>
+                                                <span class="text-emerald-700 font-extrabold text-sm sm:text-base">Rp <span x-text="formatNumber(calculatePersonShare(person))"></span></span>
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 flex justify-between mt-1">
+                                                <span>Harga Menu: Rp <span x-text="formatNumber(person.price)"></span></span>
+                                                <span class="text-emerald-600 font-semibold">Hemat: Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="p-2.5 bg-emerald-600 text-white font-extrabold rounded-xl flex justify-between items-center text-xs shadow-sm">
+                                    <span>TOTAL DITAGIH</span>
+                                    <span class="text-sm sm:text-base">Rp <span x-text="formatNumber(totalAllocatedShare)"></span></span>
+                                </div>
+
+                                <template x-if="state.payment_info">
+                                    <div class="p-2.5 bg-white/90 rounded-xl text-xs border border-slate-100 shadow-sm">
+                                        <div class="font-bold text-slate-700">Info Pembayaran / Transfer:</div>
+                                        <div class="font-mono text-slate-800 text-[11px] mt-0.5" x-text="state.payment_info"></div>
+                                    </div>
+                                </template>
+
+                                <!-- Footer Struk (Unicode murni, terjamin sejajar teks & tidak terpotong) -->
+                                <div class="pt-2.5 pb-1 border-t border-emerald-600/15 text-[11px] sm:text-xs flex items-center justify-between gap-2" style="line-height: 1.6;">
+                                    <div class="min-w-0 py-0.5" style="line-height: 1.6;">
+                                        <span class="text-emerald-700">🔗</span>
+                                        <span class="text-slate-600 font-medium"> Dihitung via: </span>
+                                        <span class="text-emerald-800 font-semibold break-all" x-text="currentAppUrl"></span>
+                                    </div>
+                                    <div class="shrink-0 text-[10px] text-slate-400 whitespace-nowrap pl-2">
+                                        <span x-text="currentClock"></span>
+                                        <span class="text-sky-500 font-bold ml-0.5">✓✓</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 shrink-0">
+                    <!-- Actions when in Text Tab -->
+                    <template x-if="shareTab === 'text'">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <button 
                                 @click="copyToClipboard" 
                                 type="button" 
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
-                                <svg v-if="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                <span>{{ copied ? 'Tersalin!' : 'Salin' }}</span>
+                                <svg x-show="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <svg x-show="!copied" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span x-text="copied ? 'Tersalin!' : 'Salin'"></span>
                             </button>
 
                             <button 
@@ -688,17 +693,19 @@
                                 <span>Kirim WA</span>
                             </button>
                         </div>
+                    </template>
 
-                        <!-- Actions when in Image Tab -->
-                        <div v-else class="flex flex-col sm:flex-row gap-2">
+                    <!-- Actions when in Image Tab -->
+                    <template x-if="shareTab === 'image'">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <button 
                                 @click="copyImageReceipt" 
                                 type="button" 
                                 :disabled="copyingImage"
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95 disabled:opacity-50">
-                                <svg v-if="copyingImage" class="w-4 h-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                <svg v-else class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                <span>{{ copyingImage ? 'Menyiapkan...' : 'Salin' }}</span>
+                                <svg x-show="copyingImage" class="w-4 h-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                <svg x-show="!copyingImage" class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span x-text="copyingImage ? 'Menyiapkan...' : 'Salin'"></span>
                             </button>
 
                             <button 
@@ -710,28 +717,31 @@
                                 <span>Unduh</span>
                             </button>
                         </div>
-                    </div>
-
+                    </template>
                 </div>
+
             </div>
-        </transition>
+        </div>
 
         <!-- Toast Notification -->
-        <transition name="fade">
-            <div v-if="toastMessage" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold shadow-xl border border-slate-700/50 flex items-center gap-2">
-                <span>{{ toastMessage }}</span>
-            </div>
-        </transition>
+        <div 
+            x-show="toastMessage" 
+            x-transition.opacity.duration.200ms
+            class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold shadow-xl border border-slate-700/50 flex items-center gap-2">
+            <span x-text="toastMessage"></span>
+        </div>
 
     </div>
 
     <script>
-        const { createApp, reactive, computed, ref, watch, onMounted } = Vue;
+        function calculator() {
+            const STORAGE_KEY = 'bagi_promo_v2';
+            const STATS_KEY = 'bagi_promo_lifetime_stats';
+            const KV_BUCKET = 'Lm8Q83y1s7Tt7Cn41FQvJk';
+            const KV_URL = `https://kvdb.io/${KV_BUCKET}/stats`;
 
-        createApp({
-            setup() {
-                // Reactive State
-                const state = reactive({
+            return {
+                state: {
                     persons: [
                         { id: 1, name: 'Orang 1', price: null, roundingAdjustment: 0 },
                         { id: 2, name: 'Orang 2', price: null, roundingAdjustment: 0 },
@@ -740,384 +750,377 @@
                     total_price: null,
                     total_ammount: null,
                     payment_info: ''
-                });
+                },
+                stats: {
+                    totalBilled: 100000,
+                    totalSaved: 35000,
+                    count: 1
+                },
+                showShareModal: false,
+                shareTab: 'text',
+                copied: false,
+                copyingImage: false,
+                toastMessage: '',
+                lastRecordedHash: '',
 
-                const showShareModal = ref(false);
-                const shareTab = ref('text'); // 'text' | 'image'
-                const copied = ref(false);
-                const copyingImage = ref(false);
-                const toastMessage = ref('');
+                init() {
+                    this.loadFromStorage();
+                    this.loadStats();
+                    this.$watch('state', () => {
+                        this.saveToStorage();
+                    });
+                },
 
                 // Helper: trigger notification toast
-                const showToast = (msg) => {
-                    toastMessage.value = msg;
+                showToast(msg) {
+                    this.toastMessage = msg;
                     setTimeout(() => {
-                        toastMessage.value = '';
+                        this.toastMessage = '';
                     }, 2500);
-                };
+                },
 
-                // Clock for WhatsApp chat preview
-                const currentClock = computed(() => {
+                // Getters
+                get currentClock() {
                     const d = new Date();
                     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-                });
-
-                // App URL for sharing
-                const currentAppUrl = computed(() => {
+                },
+                get currentAppUrl() {
                     if (typeof window !== 'undefined' && window.location && window.location.href.includes('http')) {
                         return window.location.href.split('?')[0];
                     }
                     return 'https://calculator.muliaabdi.net/';
-                });
+                },
+                get parsedTotalPrice() {
+                    return this.parseNum(this.state.total_price);
+                },
+                get parsedTotalAmount() {
+                    return this.parseNum(this.state.total_ammount);
+                },
+                get isValidParameters() {
+                    return this.parsedTotalPrice > 0 && this.parsedTotalAmount > 0;
+                },
+                get sumMenuPrices() {
+                    return this.state.persons.reduce((acc, p) => acc + this.parseNum(p.price), 0);
+                },
+                get totalDiscountAmount() {
+                    if (!this.isValidParameters) return 0;
+                    return Math.max(0, this.parsedTotalPrice - this.parsedTotalAmount);
+                },
+                get discountPercentage() {
+                    if (!this.isValidParameters || this.parsedTotalPrice === 0) return 0;
+                    const pct = ((this.parsedTotalPrice - this.parsedTotalAmount) / this.parsedTotalPrice) * 100;
+                    return Math.round(pct);
+                },
+                get payRatioPercent() {
+                    if (!this.isValidParameters || this.parsedTotalPrice === 0) return 100;
+                    const ratio = (this.parsedTotalAmount / this.parsedTotalPrice) * 100;
+                    return Math.round(ratio * 10) / 10;
+                },
+                get totalAllocatedShare() {
+                    return this.state.persons.reduce((sum, p) => sum + this.calculatePersonShare(p), 0);
+                },
+                get roundingDifference() {
+                    if (!this.isValidParameters) return 0;
+                    return this.totalAllocatedShare - this.parsedTotalAmount;
+                },
+                get activePersons() {
+                    return this.state.persons.filter(p => this.parseNum(p.price) > 0);
+                },
 
-                const copyAppUrl = async () => {
-                    try {
-                        await navigator.clipboard.writeText(currentAppUrl.value);
-                        showToast('Link website disalin ke clipboard!');
-                        if (typeof confetti === 'function') {
-                            confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
-                        }
-                    } catch (e) {
-                        showToast('Link: ' + currentAppUrl.value);
-                    }
-                };
-
-                // LocalStorage Persistence
-                const STORAGE_KEY = 'bagi_promo_v2';
-                const saveToStorage = () => {
-                    try {
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-                    } catch (e) {
-                        console.error('Storage error', e);
-                    }
-                };
-
-                const loadFromStorage = () => {
-                    try {
-                        const saved = localStorage.getItem(STORAGE_KEY);
-                        if (saved) {
-                            const parsed = JSON.parse(saved);
-                            if (parsed && Array.isArray(parsed.persons)) {
-                                state.persons = parsed.persons;
-                                state.total_price = parsed.total_price || null;
-                                state.total_ammount = parsed.total_ammount || null;
-                                state.payment_info = parsed.payment_info || '';
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Load storage error', e);
-                    }
-                };
-
-                watch(state, () => {
-                    saveToStorage();
-                }, { deep: true });
-
-                // Global Serverless Statistics (Cloud KV + Local Cache Fallback)
-                const STATS_KEY = 'bagi_promo_lifetime_stats';
-                const KV_BUCKET = 'Lm8Q83y1s7Tt7Cn41FQvJk';
-                const KV_URL = `https://kvdb.io/${KV_BUCKET}/stats`;
-
-                const stats = reactive({
-                    totalBilled: 100000,
-                    totalSaved: 35000,
-                    count: 1
-                });
-
-                const loadStats = async () => {
-                    // 1. Ambil cache lokal dulu agar responsif
-                    try {
-                        const raw = localStorage.getItem(STATS_KEY);
-                        if (raw) {
-                            const data = JSON.parse(raw);
-                            stats.totalBilled = Math.max(stats.totalBilled, Number(data.totalBilled) || 0);
-                            stats.totalSaved = Math.max(stats.totalSaved, Number(data.totalSaved) || 0);
-                            stats.count = Math.max(stats.count, Number(data.count) || 0);
-                        }
-                    } catch(e) {
-                        console.error('Local stats error', e);
-                    }
-
-                    // 2. Fetch data global terbaru dari Serverless KV
-                    try {
-                        const res = await fetch(KV_URL);
-                        if (res.ok) {
-                            const cloudData = await res.json();
-                            if (cloudData && typeof cloudData === 'object') {
-                                stats.totalBilled = Number(cloudData.totalBilled) || stats.totalBilled;
-                                stats.totalSaved = Number(cloudData.totalSaved) || stats.totalSaved;
-                                stats.count = Number(cloudData.count) || stats.count;
-                                localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-                            }
-                        }
-                    } catch (err) {
-                        // Silent fail jika offline/blokir, tetap gunakan lokal
-                    }
-                };
-
-                const saveStats = async () => {
-                    // Simpan lokal
-                    try {
-                        localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-                    } catch(e) {}
-
-                    // Simpan ke Serverless KV global
-                    try {
-                        await fetch(KV_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                totalBilled: stats.totalBilled,
-                                totalSaved: stats.totalSaved,
-                                count: stats.count
-                            })
-                        });
-                    } catch (err) {
-                        // Background sync fail silent
-                    }
-                };
-
-                let lastRecordedHash = '';
-                const recordCalculation = () => {
-                    if (!isValidParameters.value) return;
-                    const billed = parsedTotalAmount.value;
-                    const saved = totalDiscountAmount.value;
-                    const hash = `${parsedTotalPrice.value}-${billed}`;
-                    if (hash !== lastRecordedHash && billed > 0) {
-                        lastRecordedHash = hash;
-                        stats.totalBilled += billed;
-                        stats.totalSaved += saved;
-                        stats.count += 1;
-                        saveStats();
-                    }
-                };
-
-                onMounted(() => {
-                    loadFromStorage();
-                    loadStats();
-                });
-
-                // Raw value parser (remove dots)
-                const parseNum = (val) => {
+                // Number helpers
+                parseNum(val) {
                     if (!val) return 0;
                     const cleaned = val.toString().replace(/[^0-9]/g, '');
                     return cleaned ? parseInt(cleaned, 10) : 0;
-                };
-
-                // Number formatter
-                const formatNumber = (val) => {
+                },
+                formatNumber(val) {
                     if (val === null || val === undefined || val === '') return '0';
-                    const num = typeof val === 'number' ? Math.round(val) : parseNum(val);
+                    const num = typeof val === 'number' ? Math.round(val) : this.parseNum(val);
                     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                };
+                },
 
-                // Computed Values
-                const parsedTotalPrice = computed(() => parseNum(state.total_price));
-                const parsedTotalAmount = computed(() => parseNum(state.total_ammount));
-
-                const isValidParameters = computed(() => {
-                    return parsedTotalPrice.value > 0 && parsedTotalAmount.value > 0;
-                });
-
-                const sumMenuPrices = computed(() => {
-                    return state.persons.reduce((acc, p) => acc + parseNum(p.price), 0);
-                });
-
-                const totalDiscountAmount = computed(() => {
-                    if (!isValidParameters.value) return 0;
-                    return Math.max(0, parsedTotalPrice.value - parsedTotalAmount.value);
-                });
-
-                const discountPercentage = computed(() => {
-                    if (!isValidParameters.value || parsedTotalPrice.value === 0) return 0;
-                    const pct = ((parsedTotalPrice.value - parsedTotalAmount.value) / parsedTotalPrice.value) * 100;
-                    return Math.round(pct);
-                });
-
-                const payRatioPercent = computed(() => {
-                    if (!isValidParameters.value || parsedTotalPrice.value === 0) return 100;
-                    const ratio = (parsedTotalAmount.value / parsedTotalPrice.value) * 100;
-                    return Math.round(ratio * 10) / 10;
-                });
-
-                // Calculate single person share
-                const calculatePersonShare = (person) => {
-                    const price = parseNum(person.price);
-                    if (!price || !isValidParameters.value) return 0;
-                    const baseShare = Math.round((price / parsedTotalPrice.value) * parsedTotalAmount.value);
+                // Share calculation
+                calculatePersonShare(person) {
+                    const price = this.parseNum(person.price);
+                    if (!price || !this.isValidParameters) return 0;
+                    const baseShare = Math.round((price / this.parsedTotalPrice) * this.parsedTotalAmount);
                     return baseShare + (person.roundingAdjustment || 0);
-                };
-
-                // Calculate savings per person
-                const calculatePersonSaving = (person) => {
-                    const price = parseNum(person.price);
-                    if (!price || !isValidParameters.value) return 0;
-                    const share = calculatePersonShare(person);
+                },
+                calculatePersonSaving(person) {
+                    const price = this.parseNum(person.price);
+                    if (!price || !this.isValidParameters) return 0;
+                    const share = this.calculatePersonShare(person);
                     return Math.max(0, price - share);
-                };
-
-                // Total allocated share among all persons
-                const totalAllocatedShare = computed(() => {
-                    return state.persons.reduce((sum, p) => sum + calculatePersonShare(p), 0);
-                });
-
-                // Difference between total allocated vs actual paid amount
-                const roundingDifference = computed(() => {
-                    if (!isValidParameters.value) return 0;
-                    return totalAllocatedShare.value - parsedTotalAmount.value;
-                });
+                },
 
                 // Row operations
-                const addRow = () => {
-                    const nextId = state.persons.length > 0 ? Math.max(...state.persons.map(p => p.id)) + 1 : 1;
-                    state.persons.push({
+                addRow() {
+                    const nextId = this.state.persons.length > 0 ? Math.max(...this.state.persons.map(p => p.id)) + 1 : 1;
+                    this.state.persons.push({
                         id: nextId,
-                        name: `Orang ${state.persons.length + 1}`,
+                        name: `Orang ${this.state.persons.length + 1}`,
                         price: null,
                         roundingAdjustment: 0
                     });
-                };
-
-                const removeRow = (index) => {
-                    if (state.persons.length > 1) {
-                        state.persons.splice(index, 1);
+                },
+                removeRow(index) {
+                    if (this.state.persons.length > 1) {
+                        this.state.persons.splice(index, 1);
                     }
-                };
+                },
 
-                // Format input on keystroke
-                const numberOnly = (evt) => {
+                // Input handling
+                numberOnly(evt) {
                     const charCode = evt.which ? evt.which : evt.keyCode;
                     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                         evt.preventDefault();
                     }
-                };
-
-                const onFormatInput = (evt, targetObj, key) => {
+                },
+                onFormatInput(evt, targetObj, key) {
                     const raw = evt.target.value.replace(/[^0-9]/g, '');
                     if (!raw) {
                         targetObj[key] = null;
                         return;
                     }
-                    targetObj[key] = formatNumber(parseInt(raw, 10));
-                    // Reset custom rounding adjustment whenever prices change
+                    targetObj[key] = this.formatNumber(parseInt(raw, 10));
                     if (key === 'price') {
                         targetObj.roundingAdjustment = 0;
                     }
-                };
-
-                // Auto-fill Total Sebelum Diskon using sum of menu prices
-                const applySumAsOriginalPrice = () => {
-                    if (sumMenuPrices.value > 0) {
-                        state.total_price = formatNumber(sumMenuPrices.value);
-                        showToast(`Total struk diset ke Rp ${formatNumber(sumMenuPrices.value)}`);
+                },
+                applySumAsOriginalPrice() {
+                    if (this.sumMenuPrices > 0) {
+                        this.state.total_price = this.formatNumber(this.sumMenuPrices);
+                        this.showToast(`Total struk diset ke Rp ${this.formatNumber(this.sumMenuPrices)}`);
                     }
-                };
-
-                // Auto fix rounding discrepancy
-                const autoFixRounding = () => {
-                    if (roundingDifference.value === 0 || state.persons.length === 0) return;
-                    // Adjust first person with a valid price
-                    const target = state.persons.find(p => parseNum(p.price) > 0) || state.persons[0];
+                },
+                autoFixRounding() {
+                    if (this.roundingDifference === 0 || this.state.persons.length === 0) return;
+                    const target = this.state.persons.find(p => this.parseNum(p.price) > 0) || this.state.persons[0];
                     if (target) {
-                        target.roundingAdjustment = (target.roundingAdjustment || 0) - roundingDifference.value;
-                        showToast('Selisih pembulatan berhasil dipaskan!');
+                        target.roundingAdjustment = (target.roundingAdjustment || 0) - this.roundingDifference;
+                        this.showToast('Selisih pembulatan berhasil dipaskan!');
                         if (typeof confetti === 'function') {
                             confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
                         }
                     }
-                };
+                },
 
-                // Preset sample data
-                const loadSampleData = () => {
-                    state.persons = [
+                // Storage
+                saveToStorage() {
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+                    } catch (e) {
+                        console.error('Storage error', e);
+                    }
+                },
+                loadFromStorage() {
+                    try {
+                        const saved = localStorage.getItem(STORAGE_KEY);
+                        if (saved) {
+                            const parsed = JSON.parse(saved);
+                            if (parsed && Array.isArray(parsed.persons)) {
+                                this.state.persons = parsed.persons;
+                                this.state.total_price = parsed.total_price || null;
+                                this.state.total_ammount = parsed.total_ammount || null;
+                                this.state.payment_info = parsed.payment_info || '';
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Load storage error', e);
+                    }
+                },
+
+                // Stats
+                async loadStats() {
+                    try {
+                        const raw = localStorage.getItem(STATS_KEY);
+                        if (raw) {
+                            const data = JSON.parse(raw);
+                            this.stats.totalBilled = Math.max(this.stats.totalBilled, Number(data.totalBilled) || 0);
+                            this.stats.totalSaved = Math.max(this.stats.totalSaved, Number(data.totalSaved) || 0);
+                            this.stats.count = Math.max(this.stats.count, Number(data.count) || 0);
+                        }
+                    } catch (e) {}
+
+                    try {
+                        const res = await fetch(KV_URL);
+                        if (res.ok) {
+                            const cloudData = await res.json();
+                            if (cloudData && typeof cloudData === 'object') {
+                                this.stats.totalBilled = Number(cloudData.totalBilled) || this.stats.totalBilled;
+                                this.stats.totalSaved = Number(cloudData.totalSaved) || this.stats.totalSaved;
+                                this.stats.count = Number(cloudData.count) || this.stats.count;
+                                localStorage.setItem(STATS_KEY, JSON.stringify(this.stats));
+                            }
+                        }
+                    } catch (err) {}
+                },
+                async saveStats() {
+                    try {
+                        localStorage.setItem(STATS_KEY, JSON.stringify(this.stats));
+                    } catch (e) {}
+
+                    try {
+                        await fetch(KV_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                totalBilled: this.stats.totalBilled,
+                                totalSaved: this.stats.totalSaved,
+                                count: this.stats.count
+                            })
+                        });
+                    } catch (err) {}
+                },
+                recordCalculation() {
+                    if (!this.isValidParameters) return;
+                    const billed = this.parsedTotalAmount;
+                    const saved = this.totalDiscountAmount;
+                    const hash = `${this.parsedTotalPrice}-${billed}`;
+                    if (hash !== this.lastRecordedHash && billed > 0) {
+                        this.lastRecordedHash = hash;
+                        this.stats.totalBilled += billed;
+                        this.stats.totalSaved += saved;
+                        this.stats.count += 1;
+                        this.saveStats();
+                    }
+                },
+
+                // Presets & reset
+                loadSampleData() {
+                    this.state.persons = [
                         { id: 1, name: 'Andi (Nasi Bebek)', price: '45.000', roundingAdjustment: 0 },
                         { id: 2, name: 'Budi (Ayam Geprek)', price: '35.000', roundingAdjustment: 0 },
                         { id: 3, name: 'Citra (Kopi Susu)', price: '20.000', roundingAdjustment: 0 }
                     ];
-                    state.total_price = '100.000';
-                    state.total_ammount = '65.000';
-                    state.payment_info = 'BCA: 5410123456 a.n Andi / GoPay: 08123456789';
-                    showToast('Data simulasi dimuat!');
-                };
-
-                // Reset all
-                const resetAll = () => {
+                    this.state.total_price = '100.000';
+                    this.state.total_ammount = '65.000';
+                    this.state.payment_info = 'BCA: 5410123456 a.n Andi / GoPay: 08123456789';
+                    this.showToast('Data simulasi dimuat!');
+                },
+                resetAll() {
                     if (confirm('Yakin ingin mengosongkan semua data?')) {
-                        state.persons = [
+                        this.state.persons = [
                             { id: 1, name: 'Orang 1', price: null, roundingAdjustment: 0 },
                             { id: 2, name: 'Orang 2', price: null, roundingAdjustment: 0 }
                         ];
-                        state.total_price = null;
-                        state.total_ammount = null;
-                        state.payment_info = '';
+                        this.state.total_price = null;
+                        this.state.total_ammount = null;
+                        this.state.payment_info = '';
                         localStorage.removeItem(STORAGE_KEY);
-                        showToast('Form berhasil di-reset');
+                        this.showToast('Form berhasil di-reset');
                     }
-                };
+                },
 
-                const activePersons = computed(() => {
-                    return state.persons.filter(p => parseNum(p.price) > 0);
-                });
+                // Copy app URL
+                async copyAppUrl() {
+                    try {
+                        await navigator.clipboard.writeText(this.currentAppUrl);
+                        this.showToast('Link website disalin ke clipboard!');
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
+                        }
+                    } catch (e) {
+                        this.showToast('Link: ' + this.currentAppUrl);
+                    }
+                },
 
-                // WhatsApp message generation (Clean, standardized tree format)
-                const generateWhatsAppMessage = () => {
+                // WhatsApp message generator
+                generateWhatsAppMessage() {
                     const lines = [];
-                    const url = currentAppUrl.value;
+                    const url = this.currentAppUrl;
 
                     lines.push('*RINCIAN PATUNGAN MAKANAN*');
                     lines.push('─────────────────────────────');
                     
-                    if (parsedTotalPrice.value && parsedTotalAmount.value) {
+                    if (this.parsedTotalPrice && this.parsedTotalAmount) {
                         lines.push('*Ringkasan Tagihan:*');
-                        lines.push(`• Total Menu Asli : Rp ${formatNumber(parsedTotalPrice.value)}`);
-                        lines.push(`• Total Dibayar   : *Rp ${formatNumber(parsedTotalAmount.value)}*`);
-                        lines.push(`• Hemat Diskon    : *Rp ${formatNumber(totalDiscountAmount.value)} (${discountPercentage.value}% OFF)*`);
+                        lines.push(`• Total Menu Asli : Rp ${this.formatNumber(this.parsedTotalPrice)}`);
+                        lines.push(`• Total Dibayar   : *Rp ${this.formatNumber(this.parsedTotalAmount)}*`);
+                        lines.push(`• Hemat Diskon    : *Rp ${this.formatNumber(this.totalDiscountAmount)} (${this.discountPercentage}% OFF)*`);
                         lines.push('─────────────────────────────');
                     }
 
                     lines.push('*Rincian Bayar per Orang:*');
                     let count = 0;
 
-                    state.persons.forEach((p, idx) => {
-                        const price = parseNum(p.price);
+                    this.state.persons.forEach((p, idx) => {
+                        const price = this.parseNum(p.price);
                         if (price > 0) {
                             count++;
-                            const share = calculatePersonShare(p);
-                            const saving = calculatePersonSaving(p);
+                            const share = this.calculatePersonShare(p);
+                            const saving = this.calculatePersonSaving(p);
                             const name = p.name ? p.name.trim() : `Orang ${idx + 1}`;
                             
                             lines.push(`\n${count}. *${name}*`);
-                            lines.push(`   ├ Harga Menu : Rp ${formatNumber(price)}`);
+                            lines.push(`   ├ Harga Menu : Rp ${this.formatNumber(price)}`);
                             if (saving > 0) {
-                                lines.push(`   ├ Diskon     : Rp ${formatNumber(saving)}`);
+                                lines.push(`   ├ Diskon     : Rp ${this.formatNumber(saving)}`);
                             }
-                            lines.push(`   └ *Bayar      : Rp ${formatNumber(share)}*`);
+                            lines.push(`   └ *Bayar      : Rp ${this.formatNumber(share)}*`);
                         }
                     });
 
                     lines.push('\n─────────────────────────────');
-                    lines.push(`*TOTAL DITAGIH : Rp ${formatNumber(totalAllocatedShare.value)}*`);
+                    lines.push(`*TOTAL DITAGIH : Rp ${this.formatNumber(this.totalAllocatedShare)}*`);
 
-                    if (state.payment_info && state.payment_info.trim()) {
+                    if (this.state.payment_info && this.state.payment_info.trim()) {
                         lines.push('\n─────────────────────────────');
                         lines.push('*Info Pembayaran / Transfer:*');
-                        lines.push(state.payment_info.trim());
+                        lines.push(this.state.payment_info.trim());
                     }
 
                     lines.push('\n─────────────────────────────');
                     lines.push('_Dihitung via:_ ' + url);
                     
                     return lines.join('\n');
-                };
+                },
 
-                // Copy exact visual card receipt as high-res PNG image
-                const copyImageReceipt = async () => {
+                // Share modal actions
+                openShareModal() {
+                    this.recordCalculation();
+                    this.showShareModal = true;
+                    this.shareTab = 'text';
+                    this.copied = false;
+                },
+                async copyToClipboard() {
+                    this.recordCalculation();
+                    const text = this.generateWhatsAppMessage();
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        this.copied = true;
+                        this.showToast('Teks berhasil disalin ke clipboard!');
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
+                        }
+                        setTimeout(() => {
+                            this.copied = false;
+                        }, 2500);
+                    } catch (err) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        this.copied = true;
+                        this.showToast('Teks berhasil disalin!');
+                    }
+                },
+                openWhatsAppDirect() {
+                    this.recordCalculation();
+                    const text = encodeURIComponent(this.generateWhatsAppMessage());
+                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+                },
+
+                // Image receipt export via html2canvas
+                async copyImageReceipt() {
                     const el = document.getElementById('receipt-card');
                     if (!el || typeof html2canvas !== 'function') {
-                        showToast('Fitur gambar belum siap');
+                        this.showToast('Fitur gambar belum siap');
                         return;
                     }
-                    copyingImage.value = true;
+                    this.copyingImage = true;
                     try {
                         const h2cOptions = {
                             scale: 3,
@@ -1144,8 +1147,8 @@
 
                         canvas.toBlob(async (blob) => {
                             if (!blob) {
-                                showToast('Gagal memproses gambar');
-                                copyingImage.value = false;
+                                this.showToast('Gagal memproses gambar');
+                                this.copyingImage = false;
                                 return;
                             }
                             try {
@@ -1153,13 +1156,13 @@
                                     await navigator.clipboard.write([
                                         new ClipboardItem({ 'image/png': blob })
                                     ]);
-                                    showToast('Gambar struk tersalin! Paste (Ctrl+V) langsung di WA');
+                                    this.showToast('Gambar struk tersalin! Paste (Ctrl+V) langsung di WA');
                                 } else {
                                     const link = document.createElement('a');
                                     link.download = 'struk-patungan.png';
                                     link.href = canvas.toDataURL('image/png');
                                     link.click();
-                                    showToast('Gambar struk diunduh ke galeri/file');
+                                    this.showToast('Gambar struk diunduh ke galeri/file');
                                 }
                                 if (typeof confetti === 'function') {
                                     confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
@@ -1169,26 +1172,24 @@
                                 link.download = 'struk-patungan.png';
                                 link.href = canvas.toDataURL('image/png');
                                 link.click();
-                                showToast('Gambar struk diunduh!');
+                                this.showToast('Gambar struk diunduh!');
                             } finally {
-                                copyingImage.value = false;
+                                this.copyingImage = false;
                             }
                         }, 'image/png');
                     } catch (err) {
                         console.error(err);
-                        copyingImage.value = false;
-                        showToast('Gagal membuat gambar struk');
+                        this.copyingImage = false;
+                        this.showToast('Gagal membuat gambar struk');
                     }
-                };
-
-                // Direct Download image
-                const downloadImageReceipt = async () => {
+                },
+                async downloadImageReceipt() {
                     const el = document.getElementById('receipt-card');
                     if (!el || typeof html2canvas !== 'function') {
-                        showToast('Fitur gambar belum siap');
+                        this.showToast('Fitur gambar belum siap');
                         return;
                     }
-                    copyingImage.value = true;
+                    this.copyingImage = true;
                     try {
                         const h2cOptions = {
                             scale: 3,
@@ -1216,111 +1217,19 @@
                         link.download = 'struk-patungan.png';
                         link.href = canvas.toDataURL('image/png');
                         link.click();
-                        showToast('Gambar struk berhasil diunduh!');
+                        this.showToast('Gambar struk berhasil diunduh!');
                         if (typeof confetti === 'function') {
                             confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
                         }
                     } catch (err) {
                         console.error(err);
-                        showToast('Gagal mengunduh gambar');
+                        this.showToast('Gagal mengunduh gambar');
                     } finally {
-                        copyingImage.value = false;
+                        this.copyingImage = false;
                     }
-                };
-
-                // Formatted HTML for WhatsApp bubble to match actual WhatsApp output 100%
-                const formattedBubbleHtml = computed(() => {
-                    let msg = generateWhatsAppMessage();
-                    // Escape HTML characters
-                    msg = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    // Convert *bold* to <strong>
-                    msg = msg.replace(/\*([^\*\n]+)\*/g, '<strong class="font-bold text-slate-950">$1</strong>');
-                    // Convert URLs to clickable links
-                    msg = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-emerald-700 underline break-all font-medium">$1</a>');
-                    return msg;
-                });
-
-                const openShareModal = () => {
-                    recordCalculation();
-                    showShareModal.value = true;
-                    shareTab.value = 'text';
-                    copied.value = false;
-                };
-
-                const copyToClipboard = async () => {
-                    recordCalculation();
-                    const text = generateWhatsAppMessage();
-                    try {
-                        await navigator.clipboard.writeText(text);
-                        copied.value = true;
-                        showToast('Teks berhasil disalin ke clipboard!');
-                        if (typeof confetti === 'function') {
-                            confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
-                        }
-                        setTimeout(() => {
-                            copied.value = false;
-                        }, 2500);
-                    } catch (err) {
-                        // Fallback
-                        const textarea = document.createElement('textarea');
-                        textarea.value = text;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textarea);
-                        copied.value = true;
-                        showToast('Teks berhasil disalin!');
-                    }
-                };
-
-                const openWhatsAppDirect = () => {
-                    recordCalculation();
-                    const text = encodeURIComponent(generateWhatsAppMessage());
-                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-                };
-
-                return {
-                    state,
-                    stats,
-                    showShareModal,
-                    shareTab,
-                    copyingImage,
-                    formattedBubbleHtml,
-                    copied,
-                    toastMessage,
-                    currentClock,
-                    currentAppUrl,
-                    activePersons,
-                    copyAppUrl,
-                    parsedTotalPrice,
-                    parsedTotalAmount,
-                    isValidParameters,
-                    sumMenuPrices,
-                    totalDiscountAmount,
-                    discountPercentage,
-                    payRatioPercent,
-                    totalAllocatedShare,
-                    roundingDifference,
-                    calculatePersonShare,
-                    calculatePersonSaving,
-                    addRow,
-                    removeRow,
-                    numberOnly,
-                    onFormatInput,
-                    applySumAsOriginalPrice,
-                    autoFixRounding,
-                    loadSampleData,
-                    resetAll,
-                    formatNumber,
-                    generateWhatsAppMessage,
-                    copyImageReceipt,
-                    downloadImageReceipt,
-                    openShareModal,
-                    copyToClipboard,
-                    openWhatsAppDirect
-                };
-            }
-        }).mount('#app');
+                }
+            };
+        }
     </script>
 </body>
-</html>
+</html>\n
