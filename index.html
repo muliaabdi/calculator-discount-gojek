@@ -17,6 +17,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Canvas Confetti for celebrate -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <!-- html2canvas for exporting receipt as image -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -404,8 +406,10 @@
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
                         </span>
                         <div>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">Riwayat Akumulasi Patungan</h3>
-                            <p class="text-[11px] text-slate-400">Total tagihan & diskon yang pernah dihitung</p>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">
+                                Akumulasi Global Patungan
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Total tagihan & diskon pengguna sedunia</p>
                         </div>
                     </div>
 
@@ -502,25 +506,24 @@
                         </div>
                     </div>
 
-                    <!-- Switcher View -->
-                    <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
-                        <span class="font-bold text-slate-500">Mode Tampilan:</span>
-                        <div class="inline-flex rounded-lg bg-slate-200/80 p-0.5">
+                    <!-- Tab Switcher: Teks WhatsApp vs Gambar Struk -->
+                    <div class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
+                        <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200/70 w-full sm:w-auto">
                             <button 
                                 type="button"
-                                @click="modalView = 'chat'" 
-                                :class="modalView === 'chat' ? 'bg-white text-emerald-800 shadow-sm font-bold' : 'text-slate-600 font-medium'"
-                                class="px-2.5 py-1 rounded-md transition text-xs flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                <span>Pratinjau Chat</span>
+                                @click="shareTab = 'text'" 
+                                :class="shareTab === 'text' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                                class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Text</span>
                             </button>
                             <button 
                                 type="button"
-                                @click="modalView = 'text'" 
-                                :class="modalView === 'text' ? 'bg-white text-emerald-800 shadow-sm font-bold' : 'text-slate-600 font-medium'"
-                                class="px-2.5 py-1 rounded-md transition text-xs flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                <span>Teks Pesan</span>
+                                @click="shareTab = 'image'" 
+                                :class="shareTab === 'image' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                                class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <span>Gambar</span>
                             </button>
                         </div>
                     </div>
@@ -528,57 +531,187 @@
                     <!-- Modal Body / Content -->
                     <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
                         
-                        <!-- Mode 1: WhatsApp Chat Bubble Simulation (Identik 100% dengan WhatsApp) -->
-                        <div v-if="modalView === 'chat'" class="flex justify-end">
-                            <div class="max-w-[95%] sm:max-w-[90%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans border border-emerald-200/60 relative">
-                                
-                                <!-- Link Preview Box di bagian atas persis seperti WhatsApp -->
-                                <div class="bg-black/5 rounded-xl p-2.5 mb-2.5 border-l-4 border-emerald-700 text-xs select-none">
-                                    <div class="font-bold text-emerald-950 truncate">{{ currentAppUrl.replace('https://', '').replace('/', '') }}</div>
-                                    <div class="text-[11px] text-slate-600 truncate">{{ currentAppUrl }}</div>
-                                </div>
+                        <!-- TAB 1: Teks WhatsApp Preview (PERSIS sama seperti yang disalin) -->
+                        <div v-show="shareTab === 'text'" class="space-y-2.5">
+                            <div class="text-xs px-1 font-semibold text-slate-700">
+                                Pratinjau Pesan Chat WhatsApp:
+                            </div>
 
-                                <!-- Pesan Teks Asli WhatsApp (WYSIWYG) -->
-                                <div class="whitespace-pre-wrap font-sans text-slate-900 text-xs sm:text-sm leading-relaxed" v-html="formattedBubbleHtml"></div>
+                            <div class="flex justify-end">
+                                <div class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
+                                    
+                                    <div class="font-bold text-slate-950 text-sm">*RINCIAN PATUNGAN MAKANAN*</div>
+                                    <div class="text-slate-400 text-xs font-mono">─────────────────────────────</div>
 
-                                <div class="flex justify-end items-center gap-1 text-[10px] text-slate-500 pt-2">
-                                    <span>{{ currentClock }}</span>
-                                    <span class="text-sky-600 font-bold">✓✓</span>
+                                    <!-- Ringkasan Tagihan -->
+                                    <div v-if="parsedTotalPrice && parsedTotalAmount" class="space-y-0.5 text-xs text-slate-800">
+                                        <div class="font-bold text-slate-950">*Ringkasan Tagihan:*</div>
+                                        <div>• Total Menu Asli : Rp {{ formatNumber(parsedTotalPrice) }}</div>
+                                        <div>• Total Dibayar   : <strong class="font-bold text-slate-950">Rp {{ formatNumber(parsedTotalAmount) }}</strong></div>
+                                        <div>• Hemat Diskon    : <strong class="font-bold text-emerald-800">Rp {{ formatNumber(totalDiscountAmount) }} ({{ discountPercentage }}% OFF)</strong></div>
+                                        <div class="text-slate-400 text-xs font-mono pt-0.5">─────────────────────────────</div>
+                                    </div>
+
+                                    <!-- Per orang -->
+                                    <div class="space-y-2 text-xs text-slate-800">
+                                        <div class="font-bold text-slate-950">*Rincian Bayar per Orang:*</div>
+                                        <div v-for="(person, idx) in activePersons" :key="person.id" class="pl-1">
+                                            <div class="font-bold text-slate-950">{{ idx + 1 }}. *{{ person.name || ('Orang ' + (idx + 1)) }}*</div>
+                                            <div class="text-slate-600 text-[11px] font-mono whitespace-pre">   ├ Harga Menu : Rp {{ formatNumber(person.price) }}</div>
+                                            <div v-if="calculatePersonSaving(person) > 0" class="text-emerald-800 text-[11px] font-mono whitespace-pre">   ├ Diskon     : Rp {{ formatNumber(calculatePersonSaving(person)) }}</div>
+                                            <div class="font-bold text-emerald-950 text-xs font-mono whitespace-pre">   └ *Bayar      : Rp {{ formatNumber(calculatePersonShare(person)) }}*</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
+                                    <div class="font-bold text-slate-950 text-xs">
+                                        *TOTAL DITAGIH : Rp {{ formatNumber(totalAllocatedShare) }}*
+                                    </div>
+
+                                    <!-- Norek section -->
+                                    <div v-if="state.payment_info" class="pt-1 text-xs">
+                                        <div class="text-slate-400 text-xs font-mono pb-1">─────────────────────────────</div>
+                                        <div class="font-bold text-slate-950">*Info Pembayaran / Transfer:*</div>
+                                        <div class="mt-1 bg-white/80 p-2 rounded-lg font-mono text-xs select-all border border-emerald-600/10">
+                                            {{ state.payment_info }}
+                                        </div>
+                                    </div>
+
+                                    <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
+                                    <div class="text-[11px] text-slate-600 flex items-center justify-between pt-0.5">
+                                        <div class="truncate">
+                                            <span class="text-slate-600 italic">Dihitung via: </span>
+                                            <span class="text-emerald-800 underline font-medium">{{ currentAppUrl }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-[10px] text-slate-400 shrink-0">
+                                            <span>{{ currentClock }}</span>
+                                            <span class="text-sky-500 font-bold">✓✓</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Mode 2: Raw Monospace Text View -->
-                        <div v-else class="space-y-2">
-                            <label class="text-xs font-bold text-slate-700 block">Teks WhatsApp Format Bold/List:</label>
-                            <div class="bg-slate-900 text-slate-100 p-4 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed border border-slate-800 selection:bg-brand-500 select-all shadow-inner">
-{{ generateWhatsAppMessage() }}
+                        <!-- TAB 2: Gambar Struk Card (Siap Diekspor PNG) -->
+                        <div v-show="shareTab === 'image'" class="space-y-2.5">
+                            <div class="text-xs px-1 font-semibold text-slate-700">
+                                Pratinjau Foto Struk:
+                            </div>
+
+                            <div class="flex justify-end">
+                                <div id="receipt-card" class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl p-4 pb-5 shadow-sm text-xs sm:text-sm font-sans space-y-2.5 border border-emerald-200/60 leading-relaxed relative box-border">
+                                    
+                                    <!-- Header Struk (Text murni, 100% sejajar di canvas) -->
+                                    <div class="pb-2 border-b border-emerald-600/20 text-xs sm:text-sm font-extrabold text-emerald-950 uppercase tracking-wide flex items-center gap-1.5" style="line-height: 1.4;">
+                                        <span class="text-emerald-700 text-sm sm:text-base leading-none">📄</span>
+                                        <span class="leading-none">RINCIAN PATUNGAN MAKANAN</span>
+                                    </div>
+
+                                    <div class="bg-white/85 p-3 rounded-xl border border-emerald-600/10 text-xs space-y-1.5 shadow-xs">
+                                        <div class="text-slate-500 font-medium">Ringkasan Tagihan:</div>
+                                        <div class="flex justify-between font-medium">
+                                            <span class="text-slate-700">Total Menu:</span>
+                                            <span class="font-semibold text-slate-900">Rp {{ formatNumber(parsedTotalPrice) }}</span>
+                                        </div>
+                                        <div class="flex justify-between font-bold text-emerald-800">
+                                            <span>Total Dibayar:</span>
+                                            <span>Rp {{ formatNumber(parsedTotalAmount) }}</span>
+                                        </div>
+                                        <div class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
+                                            <span>Hemat Diskon:</span>
+                                            <span>Rp {{ formatNumber(totalDiscountAmount) }} ({{ discountPercentage }}% OFF)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-xs space-y-2 pt-1">
+                                        <div class="font-bold text-slate-800">Rincian Bayar per Orang:</div>
+                                        <div v-for="(person, idx) in activePersons" :key="person.id" class="bg-white/90 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                                            <div class="font-bold text-slate-900 flex items-center justify-between">
+                                                <span>{{ idx + 1 }}. {{ person.name || ('Orang ' + (idx + 1)) }}</span>
+                                                <span class="text-emerald-700 font-extrabold text-sm sm:text-base">Rp {{ formatNumber(calculatePersonShare(person)) }}</span>
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 flex justify-between mt-1">
+                                                <span>Harga Menu: Rp {{ formatNumber(person.price) }}</span>
+                                                <span class="text-emerald-600 font-semibold">Hemat: Rp {{ formatNumber(calculatePersonSaving(person)) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-2.5 bg-emerald-600 text-white font-extrabold rounded-xl flex justify-between items-center text-xs shadow-sm">
+                                        <span>TOTAL DITAGIH</span>
+                                        <span class="text-sm sm:text-base">Rp {{ formatNumber(totalAllocatedShare) }}</span>
+                                    </div>
+
+                                    <div v-if="state.payment_info" class="p-2.5 bg-white/90 rounded-xl text-xs border border-slate-100 shadow-sm">
+                                        <div class="font-bold text-slate-700">Info Pembayaran / Transfer:</div>
+                                        <div class="font-mono text-slate-800 text-[11px] mt-0.5">{{ state.payment_info }}</div>
+                                    </div>
+
+                                    <!-- Footer Struk (Unicode murni, terjamin sejajar teks & tidak terpotong) -->
+                                    <div class="pt-2.5 pb-1 border-t border-emerald-600/15 text-[11px] sm:text-xs flex items-center justify-between gap-2" style="line-height: 1.6;">
+                                        <div class="min-w-0 py-0.5" style="line-height: 1.6;">
+                                            <span class="text-emerald-700">🔗</span>
+                                            <span class="text-slate-600 font-medium"> Dihitung via: </span>
+                                            <span class="text-emerald-800 font-semibold break-all">{{ currentAppUrl }}</span>
+                                        </div>
+                                        <div class="shrink-0 text-[10px] text-slate-400 whitespace-nowrap pl-2">
+                                            <span>{{ currentClock }}</span>
+                                            <span class="text-sky-500 font-bold ml-0.5">✓✓</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Modal Actions -->
-                    <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row gap-2 shrink-0">
-                        <button 
-                            @click="copyToClipboard" 
-                            type="button" 
-                            class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
-                            <svg v-if="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            <span>{{ copied ? 'Tersalin ke Clipboard!' : 'Salin Teks WA' }}</span>
-                        </button>
+                    <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 shrink-0">
+                        <!-- Actions when in Text Tab -->
+                        <div v-if="shareTab === 'text'" class="flex flex-col sm:flex-row gap-2">
+                            <button 
+                                @click="copyToClipboard" 
+                                type="button" 
+                                class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
+                                <svg v-if="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>{{ copied ? 'Tersalin!' : 'Salin' }}</span>
+                            </button>
 
-                        <button 
-                            @click="openWhatsAppDirect" 
-                            type="button" 
-                            class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                            </svg>
-                            <span>Kirim ke WhatsApp</span>
-                        </button>
+                            <button 
+                                @click="openWhatsAppDirect" 
+                                type="button" 
+                                class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                </svg>
+                                <span>Kirim WA</span>
+                            </button>
+                        </div>
+
+                        <!-- Actions when in Image Tab -->
+                        <div v-else class="flex flex-col sm:flex-row gap-2">
+                            <button 
+                                @click="copyImageReceipt" 
+                                type="button" 
+                                :disabled="copyingImage"
+                                class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95 disabled:opacity-50">
+                                <svg v-if="copyingImage" class="w-4 h-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                <svg v-else class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>{{ copyingImage ? 'Menyiapkan...' : 'Salin' }}</span>
+                            </button>
+
+                            <button 
+                                @click="downloadImageReceipt" 
+                                type="button" 
+                                :disabled="copyingImage"
+                                class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-900 hover:bg-slate-800 text-white transition flex items-center justify-center gap-2 shadow-sm active:scale-95 disabled:opacity-50">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Unduh</span>
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </transition>
@@ -610,8 +743,9 @@
                 });
 
                 const showShareModal = ref(false);
-                const modalView = ref('chat');
+                const shareTab = ref('text'); // 'text' | 'image'
                 const copied = ref(false);
+                const copyingImage = ref(false);
                 const toastMessage = ref('');
 
                 // Helper: trigger notification toast
@@ -633,7 +767,7 @@
                     if (typeof window !== 'undefined' && window.location && window.location.href.includes('http')) {
                         return window.location.href.split('?')[0];
                     }
-                    return 'https://armnugraha.github.io/calculator-discount-gojek/';
+                    return 'https://calculator.muliaabdi.net/';
                 });
 
                 const copyAppUrl = async () => {
@@ -679,38 +813,67 @@
                     saveToStorage();
                 }, { deep: true });
 
-                // Lifetime statistics
+                // Global Serverless Statistics (Cloud KV + Local Cache Fallback)
                 const STATS_KEY = 'bagi_promo_lifetime_stats';
+                const KV_BUCKET = 'Lm8Q83y1s7Tt7Cn41FQvJk';
+                const KV_URL = `https://kvdb.io/${KV_BUCKET}/stats`;
+
                 const stats = reactive({
-                    totalBilled: 0,
-                    totalSaved: 0,
-                    count: 0
+                    totalBilled: 100000,
+                    totalSaved: 35000,
+                    count: 1
                 });
 
-                const loadStats = () => {
+                const loadStats = async () => {
+                    // 1. Ambil cache lokal dulu agar responsif
                     try {
                         const raw = localStorage.getItem(STATS_KEY);
                         if (raw) {
                             const data = JSON.parse(raw);
-                            stats.totalBilled = Number(data.totalBilled) || 0;
-                            stats.totalSaved = Number(data.totalSaved) || 0;
-                            stats.count = Number(data.count) || 0;
-                        } else {
-                            stats.totalBilled = 100000;
-                            stats.totalSaved = 35000;
-                            stats.count = 1;
-                            saveStats();
+                            stats.totalBilled = Math.max(stats.totalBilled, Number(data.totalBilled) || 0);
+                            stats.totalSaved = Math.max(stats.totalSaved, Number(data.totalSaved) || 0);
+                            stats.count = Math.max(stats.count, Number(data.count) || 0);
                         }
                     } catch(e) {
-                        console.error('Stats error', e);
+                        console.error('Local stats error', e);
+                    }
+
+                    // 2. Fetch data global terbaru dari Serverless KV
+                    try {
+                        const res = await fetch(KV_URL);
+                        if (res.ok) {
+                            const cloudData = await res.json();
+                            if (cloudData && typeof cloudData === 'object') {
+                                stats.totalBilled = Number(cloudData.totalBilled) || stats.totalBilled;
+                                stats.totalSaved = Number(cloudData.totalSaved) || stats.totalSaved;
+                                stats.count = Number(cloudData.count) || stats.count;
+                                localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+                            }
+                        }
+                    } catch (err) {
+                        // Silent fail jika offline/blokir, tetap gunakan lokal
                     }
                 };
 
-                const saveStats = () => {
+                const saveStats = async () => {
+                    // Simpan lokal
                     try {
                         localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-                    } catch(e) {
-                        console.error('Stats save error', e);
+                    } catch(e) {}
+
+                    // Simpan ke Serverless KV global
+                    try {
+                        await fetch(KV_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                totalBilled: stats.totalBilled,
+                                totalSaved: stats.totalSaved,
+                                count: stats.count
+                            })
+                        });
+                    } catch (err) {
+                        // Background sync fail silent
                     }
                 };
 
@@ -896,7 +1059,7 @@
                     return state.persons.filter(p => parseNum(p.price) > 0);
                 });
 
-                // WhatsApp message generation (Tree aesthetic with URL link)
+                // WhatsApp message generation (Clean, standardized tree format)
                 const generateWhatsAppMessage = () => {
                     const lines = [];
                     const url = currentAppUrl.value;
@@ -912,7 +1075,7 @@
                         lines.push('─────────────────────────────');
                     }
 
-                    lines.push('*Rincian per Orang:*');
+                    lines.push('*Rincian Bayar per Orang:*');
                     let count = 0;
 
                     state.persons.forEach((p, idx) => {
@@ -936,16 +1099,133 @@
                     lines.push(`*TOTAL DITAGIH : Rp ${formatNumber(totalAllocatedShare.value)}*`);
 
                     if (state.payment_info && state.payment_info.trim()) {
-                        lines.push('');
+                        lines.push('\n─────────────────────────────');
                         lines.push('*Info Pembayaran / Transfer:*');
                         lines.push(state.payment_info.trim());
                     }
 
                     lines.push('\n─────────────────────────────');
-                    lines.push('*Link hitung:*');
-                    lines.push(url);
+                    lines.push('_Dihitung via:_ ' + url);
                     
                     return lines.join('\n');
+                };
+
+                // Copy exact visual card receipt as high-res PNG image
+                const copyImageReceipt = async () => {
+                    const el = document.getElementById('receipt-card');
+                    if (!el || typeof html2canvas !== 'function') {
+                        showToast('Fitur gambar belum siap');
+                        return;
+                    }
+                    copyingImage.value = true;
+                    try {
+                        const h2cOptions = {
+                            scale: 3,
+                            backgroundColor: '#DCF8C6',
+                            useCORS: true,
+                            logging: false,
+                            scrollY: 0,
+                            scrollX: 0,
+                            onclone: (clonedDoc) => {
+                                const clonedEl = clonedDoc.getElementById('receipt-card');
+                                if (clonedEl) {
+                                    clonedEl.style.overflow = 'visible';
+                                    let parent = clonedEl.parentElement;
+                                    while (parent && parent !== clonedDoc.body) {
+                                        parent.style.overflow = 'visible';
+                                        parent.style.maxHeight = 'none';
+                                        parent.style.height = 'auto';
+                                        parent = parent.parentElement;
+                                    }
+                                }
+                            }
+                        };
+                        const canvas = await html2canvas(el, h2cOptions);
+
+                        canvas.toBlob(async (blob) => {
+                            if (!blob) {
+                                showToast('Gagal memproses gambar');
+                                copyingImage.value = false;
+                                return;
+                            }
+                            try {
+                                if (navigator.clipboard && window.ClipboardItem && navigator.clipboard.write) {
+                                    await navigator.clipboard.write([
+                                        new ClipboardItem({ 'image/png': blob })
+                                    ]);
+                                    showToast('Gambar struk tersalin! Paste (Ctrl+V) langsung di WA');
+                                } else {
+                                    const link = document.createElement('a');
+                                    link.download = 'struk-patungan.png';
+                                    link.href = canvas.toDataURL('image/png');
+                                    link.click();
+                                    showToast('Gambar struk diunduh ke galeri/file');
+                                }
+                                if (typeof confetti === 'function') {
+                                    confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+                                }
+                            } catch (err) {
+                                const link = document.createElement('a');
+                                link.download = 'struk-patungan.png';
+                                link.href = canvas.toDataURL('image/png');
+                                link.click();
+                                showToast('Gambar struk diunduh!');
+                            } finally {
+                                copyingImage.value = false;
+                            }
+                        }, 'image/png');
+                    } catch (err) {
+                        console.error(err);
+                        copyingImage.value = false;
+                        showToast('Gagal membuat gambar struk');
+                    }
+                };
+
+                // Direct Download image
+                const downloadImageReceipt = async () => {
+                    const el = document.getElementById('receipt-card');
+                    if (!el || typeof html2canvas !== 'function') {
+                        showToast('Fitur gambar belum siap');
+                        return;
+                    }
+                    copyingImage.value = true;
+                    try {
+                        const h2cOptions = {
+                            scale: 3,
+                            backgroundColor: '#DCF8C6',
+                            useCORS: true,
+                            logging: false,
+                            scrollY: 0,
+                            scrollX: 0,
+                            onclone: (clonedDoc) => {
+                                const clonedEl = clonedDoc.getElementById('receipt-card');
+                                if (clonedEl) {
+                                    clonedEl.style.overflow = 'visible';
+                                    let parent = clonedEl.parentElement;
+                                    while (parent && parent !== clonedDoc.body) {
+                                        parent.style.overflow = 'visible';
+                                        parent.style.maxHeight = 'none';
+                                        parent.style.height = 'auto';
+                                        parent = parent.parentElement;
+                                    }
+                                }
+                            }
+                        };
+                        const canvas = await html2canvas(el, h2cOptions);
+                        const link = document.createElement('a');
+                        link.download = 'struk-patungan.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        showToast('Gambar struk berhasil diunduh!');
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showToast('Gagal mengunduh gambar');
+                    } finally {
+                        copyingImage.value = false;
+                    }
                 };
 
                 // Formatted HTML for WhatsApp bubble to match actual WhatsApp output 100%
@@ -963,6 +1243,7 @@
                 const openShareModal = () => {
                     recordCalculation();
                     showShareModal.value = true;
+                    shareTab.value = 'text';
                     copied.value = false;
                 };
 
@@ -1002,7 +1283,8 @@
                     state,
                     stats,
                     showShareModal,
-                    modalView,
+                    shareTab,
+                    copyingImage,
                     formattedBubbleHtml,
                     copied,
                     toastMessage,
@@ -1031,6 +1313,8 @@
                     resetAll,
                     formatNumber,
                     generateWhatsAppMessage,
+                    copyImageReceipt,
+                    downloadImageReceipt,
                     openShareModal,
                     copyToClipboard,
                     openWhatsAppDirect
