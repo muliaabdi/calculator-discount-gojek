@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>BagiPromo - Kalkulator Patungan Diskon GoFood, GrabFood & ShopeeFood</title>
-    <meta name="description" content="Kalkulator patungan online untuk bagi diskon makanan Gojek, GrabFood, dan ShopeeFood secara adil dan proporsional. Dilengkapi fitur scan struk otomatis (OCR), koreksi pembulatan, dan kirim ke WhatsApp.">
-    <meta name="keywords" content="kalkulator patungan, bagi promo, hitung diskon makanan, split bill makanan, diskon gofood, diskon grabfood, patungan shopeefood, scan struk ocr, bagi tagihan proporsional">
+    <meta name="description"
+        content="Kalkulator patungan online untuk bagi diskon makanan Gojek, GrabFood, dan ShopeeFood secara adil dan proporsional. Dilengkapi fitur scan struk otomatis (OCR), koreksi pembulatan, dan kirim ke WhatsApp.">
+    <meta name="keywords"
+        content="kalkulator patungan, bagi promo, hitung diskon makanan, split bill makanan, diskon gofood, diskon grabfood, patungan shopeefood, scan struk ocr, bagi tagihan proporsional">
     <meta name="author" content="Mulia Abdi">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://calculator.muliaabdi.net/">
@@ -15,7 +18,8 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://calculator.muliaabdi.net/">
     <meta property="og:title" content="BagiPromo - Kalkulator Patungan Diskon GoFood, GrabFood & ShopeeFood">
-    <meta property="og:description" content="Hitung pembagian patungan diskon makanan secara proporsional dan adil saat pesan bareng. Lengkap dengan fitur scan struk otomatis, koreksi pembulatan, dan bagikan ke WhatsApp.">
+    <meta property="og:description"
+        content="Hitung pembagian patungan diskon makanan secara proporsional dan adil saat pesan bareng. Lengkap dengan fitur scan struk otomatis, koreksi pembulatan, dan bagikan ke WhatsApp.">
     <meta property="og:site_name" content="BagiPromo">
     <meta property="og:locale" content="id_ID">
 
@@ -23,7 +27,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://calculator.muliaabdi.net/">
     <meta name="twitter:title" content="BagiPromo - Kalkulator Patungan Diskon Makanan">
-    <meta name="twitter:description" content="Hitung patungan diskon makanan Gojek, Grab, ShopeeFood proporsional & adil dengan scan struk otomatis.">
+    <meta name="twitter:description"
+        content="Hitung patungan diskon makanan Gojek, Grab, ShopeeFood proporsional & adil dengan scan struk otomatis.">
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -54,7 +59,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Alpine.js & Tailwind CSS CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
@@ -88,8 +94,10 @@
     </script>
 
     <style>
-        [x-cloak] { display: none !important; }
-        
+        [x-cloak] {
+            display: none !important;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #F8FAFC;
@@ -98,7 +106,9 @@
         }
 
         /* Prevent auto-zoom on iOS inputs */
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             font-size: 16px !important;
         }
 
@@ -107,6 +117,7 @@
             width: 6px;
             height: 6px;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #CBD5E1;
             border-radius: 9999px;
@@ -118,16 +129,20 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-700">
 
     <div id="app" x-data="calculator()" x-cloak class="flex-1 flex flex-col pb-20 sm:pb-24">
-        
+
         <!-- Top App Bar -->
-        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+        <header
+            class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
             <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div
+                        class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <line x1="19" y1="5" x2="5" y2="19"></line>
                             <circle cx="6.5" cy="6.5" r="2.5"></circle>
                             <circle cx="17.5" cy="17.5" r="2.5"></circle>
@@ -137,66 +152,84 @@
                         <div class="flex items-center gap-1.5">
                             <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">BagiPromo</h1>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium">Bagi Tagihan & Diskon Makanan Adil</p>
+                        <p class="text-xs text-slate-500 font-medium" x-text="t('appSubtitle')"></p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-1.5 sm:gap-2">
-                    <button 
-                        @click="showScanPickerModal = true" 
-                        type="button"
+                    <!-- Toggle Bahasa ID / EN -->
+                    <div
+                        class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200/80 text-[11px] font-bold shrink-0">
+                        <button @click="setLanguage('id')" type="button"
+                            :class="lang === 'id' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-1.5 py-1 rounded-md transition" title="Bahasa Indonesia">
+                            ID
+                        </button>
+                        <button @click="setLanguage('en')" type="button"
+                            :class="lang === 'en' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-1.5 py-1 rounded-md transition" title="English">
+                            EN
+                        </button>
+                    </div>
+
+                    <button @click="showScanPickerModal = true" type="button"
                         class="px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-lg transition active:scale-95 flex items-center gap-1.5 shadow-2xs group"
-                        title="Pindai struk dengan kamera atau foto">
-                        <svg class="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                        <span>Scan Struk</span>
+                        :title="t('scanReceipt')">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                            </path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span x-text="t('scanReceipt')"></span>
                     </button>
 
                     <!-- Input 1: Kamera Belakang Langsung (capture=environment) -->
-                    <input 
-                        type="file" 
-                        x-ref="cameraInput" 
-                        accept="image/*" 
-                        capture="environment" 
-                        class="hidden" 
+                    <input type="file" x-ref="cameraInput" accept="image/*" capture="environment" class="hidden"
                         @change="handleReceiptImageUpload($event)">
 
                     <!-- Input 2: Album Galeri / File Screenshot -->
-                    <input 
-                        type="file" 
-                        x-ref="galleryInput" 
-                        accept="image/*" 
-                        class="hidden" 
+                    <input type="file" x-ref="galleryInput" accept="image/*" class="hidden"
                         @change="handleReceiptImageUpload($event)">
 
-                    <button 
-                        @click="resetAll" 
-                        type="button"
+                    <button @click="resetAll" type="button"
                         class="px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition active:scale-95 flex items-center gap-1"
-                        title="Reset semua formulir">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                        <span class="hidden sm:inline">Reset</span>
+                        :title="t('reset')">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                        <span class="hidden sm:inline" x-text="t('reset')"></span>
                     </button>
                 </div>
             </div>
         </header>
 
         <main class="max-w-4xl mx-auto px-4 pt-3 sm:pt-5 w-full space-y-4 sm:space-y-5">
-            
+
             <!-- Parameter Struk Card -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm relative overflow-hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+            <section
+                class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm relative overflow-hidden">
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
                     <div class="flex items-center gap-2">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700">Parameter Struk Pesanan</h2>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700"
+                            x-text="t('receiptParams')"></h2>
                     </div>
 
                     <template x-if="sumMenuPrices > 0">
                         <div class="flex items-center gap-2">
-                            <button 
-                                @click="applySumAsOriginalPrice"
-                                type="button"
+                            <button @click="applySumAsOriginalPrice" type="button"
                                 class="text-xs text-brand-600 hover:text-brand-700 font-semibold bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-md transition flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span>Gunakan Total Menu (Rp <span x-text="formatNumber(sumMenuPrices)"></span>)</span>
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span><span x-text="t('useMenuSum')"></span> (Rp <span
+                                        x-text="formatNumber(sumMenuPrices)"></span>)</span>
                             </button>
                         </div>
                     </template>
@@ -207,72 +240,71 @@
                     <div>
                         <div class="flex justify-between items-center mb-1.5">
                             <label for="total_price" class="text-xs font-bold text-slate-700 flex items-center gap-1">
-                                <span>1. Total Sebelum Diskon</span>
-                                <span class="text-slate-400 font-normal">(Struk Asli)</span>
+                                <span x-text="t('totalBeforeDiscount')"></span>
+                                <span class="text-slate-400 font-normal" x-text="t('receiptOriginal')"></span>
                             </label>
                         </div>
                         <div class="relative group">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-slate-400 group-focus-within:text-brand-600 transition">Rp</span>
-                            <input 
-                                id="total_price"
-                                type="text"
-                                inputmode="numeric"
-                                x-model="state.total_price"
-                                placeholder="Contoh: 120.000"
-                                @keypress="numberOnly($event)"
+                            <span
+                                class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-slate-400 group-focus-within:text-brand-600 transition">Rp</span>
+                            <input id="total_price" type="text" inputmode="numeric" x-model="state.total_price"
+                                placeholder="Contoh: 120.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_price')"
-                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm"
-                            >
+                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm">
                         </div>
                     </div>
 
                     <!-- Total Akhir Dibayar -->
                     <div>
                         <div class="flex justify-between items-center mb-1.5">
-                            <label for="total_ammount" class="text-xs font-bold text-emerald-800 flex items-center gap-1">
-                                <span>2. Total Akhir Dibayar</span>
-                                <span class="text-emerald-600 font-normal">(Setelah Voucher)</span>
+                            <label for="total_ammount"
+                                class="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                                <span x-text="t('totalPaid')"></span>
+                                <span class="text-emerald-600 font-normal" x-text="t('afterVoucher')"></span>
                             </label>
                         </div>
                         <div class="relative group">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-emerald-600">Rp</span>
-                            <input 
-                                id="total_ammount"
-                                type="text"
-                                inputmode="numeric"
-                                x-model="state.total_ammount"
-                                placeholder="Contoh: 75.000"
-                                @keypress="numberOnly($event)"
+                            <span
+                                class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-emerald-600">Rp</span>
+                            <input id="total_ammount" type="text" inputmode="numeric" x-model="state.total_ammount"
+                                placeholder="Contoh: 75.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_ammount')"
-                                class="w-full pl-11 pr-4 py-3 bg-emerald-50/60 border border-emerald-300 rounded-xl font-bold text-emerald-900 placeholder:text-emerald-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm"
-                            >
+                                class="w-full pl-11 pr-4 py-3 bg-emerald-50/60 border border-emerald-300 rounded-xl font-bold text-emerald-900 placeholder:text-emerald-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm">
                         </div>
                     </div>
                 </div>
 
                 <!-- Live Saving Stats Banner -->
                 <template x-if="isValidParameters">
-                    <div class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
+                    <div
+                        class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <div
+                                class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z">
+                                    </path>
                                     <line x1="7" y1="7" x2="7.01" y2="7"></line>
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-xs font-semibold text-emerald-900">Total Penghematan Diskon</div>
+                                <div class="text-xs font-semibold text-emerald-900" x-text="t('discountSaving')"></div>
                                 <div class="text-sm font-extrabold text-emerald-700">
-                                    <span>Hemat Rp <span x-text="formatNumber(totalDiscountAmount)"></span></span>
-                                    <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-200/80 text-emerald-800 ml-1">
-                                        <span x-text="discountPercentage"></span>% OFF
+                                    <span><span x-text="t('saved')"></span> Rp <span
+                                            x-text="formatNumber(totalDiscountAmount)"></span></span>
+                                    <span
+                                        class="text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-200/80 text-emerald-800 ml-1">
+                                        <span x-text="discountPercentage"></span>% <span x-text="t('off')"></span>
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="text-right text-xs text-slate-500 font-medium">
-                            Rasio Bayar: <span class="font-bold text-slate-700"><span x-text="payRatioPercent"></span>%</span> dari harga menu
+                            <span x-text="t('payRatio') + ': '"></span><span class="font-bold text-slate-700"><span
+                                    x-text="payRatioPercent"></span>%</span> <span x-text="t('ofMenuPrice')"></span>
                         </div>
                     </div>
                 </template>
@@ -282,8 +314,9 @@
             <section class="space-y-3">
                 <div class="flex items-center justify-between px-1">
                     <div>
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700">Daftar Menu & Pemesan</h2>
-                        <p class="text-xs text-slate-400">Tiap orang bayar proporsional sesuai porsi diskon</p>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700"
+                            x-text="t('menuAndDiners')"></h2>
+                        <p class="text-xs text-slate-400" x-text="t('menuDinersSubtitle')"></p>
                     </div>
                     <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
                         <span x-text="state.persons.length"></span> Menu
@@ -293,73 +326,81 @@
                 <!-- Cards List -->
                 <div class="relative space-y-3">
                     <template x-for="(person, idx) in state.persons" :key="person.id">
-                        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-sm hover:border-slate-300 hover:shadow-md transition-all group relative">
-                            
+                        <div
+                            class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-sm hover:border-slate-300 hover:shadow-md transition-all group relative">
+
                             <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                                 <!-- Nomor urut & Nama Pemesan -->
                                 <div class="flex items-center gap-2 flex-1 min-w-[140px]">
-                                    <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center shrink-0">
+                                    <div
+                                        class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center shrink-0">
                                         <span x-text="idx + 1"></span>
                                     </div>
-                                    <input 
-                                        type="text" 
-                                        x-model="person.name" 
-                                        :placeholder="'Nama / Menu ' + (idx + 1)"
-                                        class="w-full px-3 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-300 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-slate-300 rounded-lg outline-none transition"
-                                    >
+                                    <input type="text" x-model="person.name"
+                                        :placeholder="t('itemPlaceholder') + ' ' + (idx + 1)"
+                                        class="w-full px-3 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-300 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-slate-300 rounded-lg outline-none transition">
                                 </div>
 
                                 <!-- Input Harga Menu -->
                                 <div class="w-full sm:w-44 shrink-0">
                                     <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
-                                        <input 
-                                            type="text"
-                                            inputmode="numeric"
-                                            x-model="person.price"
-                                            placeholder="Harga menu"
-                                            @keypress="numberOnly($event)"
+                                        <span
+                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                        <input type="text" inputmode="numeric" x-model="person.price"
+                                            :placeholder="t('pricePlaceholder')" @keypress="numberOnly($event)"
                                             @input="onFormatInput($event, person, 'price')"
-                                            class="w-full pl-9 pr-3 py-2 text-sm font-bold text-slate-800 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 rounded-xl outline-none transition"
-                                        >
+                                            class="w-full pl-9 pr-3 py-2 text-sm font-bold text-slate-800 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 rounded-xl outline-none transition">
                                     </div>
                                 </div>
 
                                 <!-- Panah indikator (Desktop only) -->
                                 <div class="hidden sm:flex text-slate-300 items-center justify-center shrink-0">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
                                 </div>
 
                                 <!-- Hasil Bayar Bersih -->
-                                <div class="flex-1 w-full bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between sm:justify-start sm:gap-3 min-h-[48px]">
+                                <div
+                                    class="flex-1 w-full bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between sm:justify-start sm:gap-3 min-h-[48px]">
                                     <div class="flex flex-col">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700/80">Bayar Bersih</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700/80"
+                                            x-text="t('netPay')"></span>
                                         <div class="text-base sm:text-lg font-extrabold text-emerald-800 leading-tight">
                                             <span x-show="isValidParameters && parseNum(person.price) > 0">
                                                 Rp <span x-text="formatNumber(calculatePersonShare(person))"></span>
                                             </span>
-                                            <span x-show="!isValidParameters || !parseNum(person.price)" class="text-slate-300 font-semibold text-sm">
+                                            <span x-show="!isValidParameters || !parseNum(person.price)"
+                                                class="text-slate-300 font-semibold text-sm">
                                                 -
                                             </span>
                                         </div>
                                     </div>
 
                                     <!-- Hemat Badge -->
-                                    <div x-show="isValidParameters && parseNum(person.price) > 0 && calculatePersonSaving(person) > 0" class="text-right sm:ml-auto">
-                                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
-                                            Hemat Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span>
+                                    <div x-show="isValidParameters && parseNum(person.price) > 0 && calculatePersonSaving(person) > 0"
+                                        class="text-right sm:ml-auto">
+                                        <span
+                                            class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
+                                            <span x-text="t('saved')"></span> Rp <span
+                                                x-text="formatNumber(calculatePersonSaving(person))"></span>
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Delete button -->
-                                <button 
-                                    x-show="state.persons.length > 1"
-                                    @click="removeRow(idx)" 
-                                    type="button" 
-                                    class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90 self-end sm:self-center shrink-0" 
+                                <button x-show="state.persons.length > 1" @click="removeRow(idx)" type="button"
+                                    class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90 self-end sm:self-center shrink-0"
                                     title="Hapus baris">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -367,14 +408,17 @@
                 </div>
 
                 <!-- Tombol Tambah Menu -->
-                <button 
-                    @click="addRow" 
-                    type="button" 
+                <button @click="addRow" type="button"
                     class="w-full py-3.5 bg-white hover:bg-slate-50 border-2 border-dashed border-slate-300 hover:border-brand-500 rounded-2xl text-slate-600 hover:text-brand-600 font-bold text-sm transition flex items-center justify-center gap-2 group shadow-sm active:scale-[0.99]">
-                    <div class="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-brand-100 text-slate-500 group-hover:text-brand-600 flex items-center justify-center transition">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <div
+                        class="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-brand-100 text-slate-500 group-hover:text-brand-600 flex items-center justify-center transition">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
                     </div>
-                    <span>Tambah Menu / Teman Lain</span>
+                    <span x-text="t('addMenu')"></span>
                 </button>
             </section>
 
@@ -382,37 +426,42 @@
             <template x-if="isValidParameters">
                 <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Status Validasi & Pembulatan</h3>
-                        <span 
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500"
+                            x-text="t('statusValidation')"></h3>
+                        <span
                             :class="roundingDifference === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
                             class="text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full" :class="roundingDifference === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
-                            <span x-text="roundingDifference === 0 ? 'Pas 100%' : 'Ada Selisih Pembulatan'"></span>
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                :class="roundingDifference === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                            <span
+                                x-text="roundingDifference === 0 ? t('exact100') : (t('diffLabel') + ' ' + t('roundingDiff'))"></span>
                         </span>
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <div class="text-[11px] font-semibold text-slate-400">Total Bayar Struk</div>
-                            <div class="text-base font-bold text-slate-800">Rp <span x-text="formatNumber(parsedTotalAmount)"></span></div>
+                            <div class="text-[11px] font-semibold text-slate-400" x-text="t('receiptTotal')"></div>
+                            <div class="text-base font-bold text-slate-800">Rp <span
+                                    x-text="formatNumber(parsedTotalAmount)"></span></div>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <div class="text-[11px] font-semibold text-slate-400">Total Hasil Bagi</div>
-                            <div class="text-base font-bold text-slate-800">Rp <span x-text="formatNumber(totalAllocatedShare)"></span></div>
+                            <div class="text-[11px] font-semibold text-slate-400" x-text="t('splitResultTotal')"></div>
+                            <div class="text-base font-bold text-slate-800">Rp <span
+                                    x-text="formatNumber(totalAllocatedShare)"></span></div>
                         </div>
-                        <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border" :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/70 border-amber-200'">
-                            <div class="text-[11px] font-semibold" :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-700'">
-                                Selisih (Rounding)
-                            </div>
-                            <div class="text-base font-extrabold flex items-center justify-between" :class="roundingDifference === 0 ? 'text-emerald-800' : 'text-amber-900'">
-                                <span><span x-text="roundingDifference > 0 ? '+' : ''"></span>Rp <span x-text="formatNumber(roundingDifference)"></span></span>
+                        <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border"
+                            :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/70 border-amber-200'">
+                            <div class="text-[11px] font-semibold"
+                                :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-700'"
+                                x-text="t('roundingDiff')"></div>
+                            <div class="text-base font-extrabold flex items-center justify-between"
+                                :class="roundingDifference === 0 ? 'text-emerald-800' : 'text-amber-900'">
+                                <span><span x-text="roundingDifference > 0 ? '+' : ''"></span>Rp <span
+                                        x-text="formatNumber(roundingDifference)"></span></span>
                                 <template x-if="roundingDifference !== 0">
-                                    <button 
-                                        @click="autoFixRounding"
-                                        type="button"
+                                    <button @click="autoFixRounding" type="button"
                                         class="text-[11px] font-bold bg-amber-200/80 hover:bg-amber-300 text-amber-900 px-2 py-0.5 rounded-md transition"
-                                        title="Otomatis bulatkan selisih ke item terbesar">
-                                        Pas-kan
+                                        title="Otomatis bulatkan selisih ke item terbesar" x-text="t('fixRoundingBtn')">
                                     </button>
                                 </template>
                             </div>
@@ -421,68 +470,98 @@
 
                     <template x-if="roundingDifference !== 0">
                         <p class="text-xs text-amber-700/90 leading-relaxed flex items-start gap-1.5">
-                            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                            <span>Selisih Rp <span x-text="Math.abs(roundingDifference)"></span> terjadi akibat pembulatan per item. Klik <b>"Pas-kan"</b> untuk menyerap selisih ke item pertama.</span>
+                            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span><span x-text="t('diffLabel')"></span> Rp <span
+                                    x-text="Math.abs(roundingDifference)"></span> <span
+                                    x-text="t('roundingNote')"></span></span>
                         </p>
                     </template>
                 </section>
             </template>
 
             <!-- Card Rekening / Info Pembayaran -->
+            <!-- Card Rekening / Info Pembayaran -->
             <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
-                    <label for="payment_info" class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="10" y1="10" x2="23" y2="10"></line></svg>
-                        <span>Tujuan Transfer / Info Pembayaran (Opsional)</span>
+                    <label for="payment_info"
+                        class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="10" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        <span x-text="t('paymentInfoTitle')"></span>
                     </label>
-                    <span class="text-[11px] text-slate-400">Masuk ke teks WA</span>
+                    <span class="text-[11px] text-slate-400" x-text="t('paymentInfoHint')"></span>
                 </div>
-                <input 
-                    id="payment_info"
-                    type="text" 
-                    x-model="state.payment_info" 
-                    placeholder="Contoh: BCA 1234567890 a.n Budi / GoPay 08123456789"
-                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition"
-                >
+                <input id="payment_info" type="text" x-model="state.payment_info"
+                    :placeholder="t('paymentInfoPlaceholder')"
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition">
             </section>
 
             <!-- Statistik Akumulasi Tagihan & Diskon -->
-            <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-700/60 relative overflow-hidden">
+            <section
+                class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-700/60 relative overflow-hidden">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-700/60">
                     <div class="flex items-center gap-2">
-                        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+                        <span
+                            class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20v-6M6 20V10M18 20V4" />
+                            </svg>
                         </span>
                         <div>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">
-                                Akumulasi Global Patungan
-                            </h3>
-                            <p class="text-[11px] text-slate-400">Total tagihan & diskon pengguna sedunia</p>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200"
+                                x-text="lang === 'en' ? 'Global Bill Split Stats' : 'Akumulasi Global Patungan'"></h3>
+                            <p class="text-[11px] text-slate-400"
+                                x-text="lang === 'en' ? 'Total bills & savings worldwide' : 'Total tagihan & diskon pengguna sedunia'">
+                            </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1.5">
-                        <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-700/50 px-2.5 py-0.5 rounded-full">
-                            <span x-text="stats.count || 1"></span>x Dihitung
+                        <span
+                            class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-700/50 px-2.5 py-0.5 rounded-full">
+                            <span x-text="stats.count || 1"></span>x <span
+                                x-text="lang === 'en' ? 'Calculated' : 'Dihitung'"></span>
                         </span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-3.5">
-                    <div class="bg-slate-800/90 rounded-xl p-3 border border-slate-700/60 flex flex-col justify-between">
+                    <div
+                        class="bg-slate-800/90 rounded-xl p-3 border border-slate-700/60 flex flex-col justify-between">
                         <div class="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
-                            <span>Total Tagihan Dihitung</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z" />
+                                <line x1="8" y1="8" x2="16" y2="8" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                                <line x1="8" y1="16" x2="12" y2="16" />
+                            </svg>
+                            <span x-text="lang === 'en' ? 'Total Billed' : 'Total Tagihan Dihitung'"></span>
                         </div>
                         <div class="text-base sm:text-lg font-black text-white mt-1">
                             Rp <span x-text="formatNumber(stats.totalBilled)"></span>
                         </div>
                     </div>
 
-                    <div class="bg-emerald-950/40 rounded-xl p-3 border border-emerald-800/50 flex flex-col justify-between">
+                    <div
+                        class="bg-emerald-950/40 rounded-xl p-3 border border-emerald-800/50 flex flex-col justify-between">
                         <div class="text-[11px] font-medium text-emerald-400 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                            <span>Total Diskon Dihemat</span>
+                            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span x-text="lang === 'en' ? 'Total Discount Saved' : 'Total Diskon Dihemat'"></span>
                         </div>
                         <div class="text-base sm:text-lg font-black text-emerald-400 mt-1">
                             Rp <span x-text="formatNumber(stats.totalSaved)"></span>
@@ -494,10 +573,12 @@
         </main>
 
         <!-- Fixed Bottom Bar for Mobile & Quick Action -->
-        <footer class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-20 safe-bottom">
+        <footer
+            class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-20 safe-bottom">
             <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
                 <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Ditagih</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block"
+                        x-text="t('totalBilled')"></span>
                     <div class="text-lg sm:text-xl font-black text-slate-900 leading-tight">
                         Rp <span x-text="formatNumber(parsedTotalAmount || 0)"></span>
                     </div>
@@ -505,33 +586,30 @@
 
                 <div class="flex items-center gap-2">
                     <!-- Share WA Button -->
-                    <button 
-                        @click="openShareModal" 
-                        type="button"
-                        :disabled="!isValidParameters"
+                    <button @click="openShareModal" type="button" :disabled="!isValidParameters"
                         class="px-4 py-2.5 rounded-xl font-bold text-sm bg-brand-500 hover:bg-brand-600 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-white shadow-md shadow-brand-500/25 transition flex items-center gap-2">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                            <path
+                                d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
                         </svg>
-                        <span>Bagi ke WA</span>
+                        <span x-text="lang === 'en' ? 'Share' : 'Bagi ke WA'"></span>
                     </button>
                 </div>
             </div>
         </footer>
 
         <!-- Modal WhatsApp Share & Rincian -->
-        <div 
-            x-show="showShareModal" 
-            x-transition.opacity.duration.200ms
+        <div x-show="showShareModal" x-transition.opacity.duration.200ms
             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
-            <div 
-                @click.outside="showShareModal = false"
+            <div @click.outside="showShareModal = false"
                 class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
                 <!-- WhatsApp Header Mockup -->
                 <div class="bg-[#075E54] px-4 py-3 text-white flex items-center justify-between shrink-0 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-inner shrink-0">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <div
+                            class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-inner shrink-0">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -540,98 +618,136 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-sm leading-tight flex items-center gap-1.5">
-                                <span>Patungan Makan</span>
-                                <span class="text-[10px] bg-emerald-700/80 px-1.5 py-0.2 rounded text-emerald-200">Grup</span>
+                                <span x-text="lang === 'en' ? 'Food Bill Split' : 'Patungan Makan'"></span>
+                                <span class="text-[10px] bg-emerald-700/80 px-1.5 py-0.2 rounded text-emerald-200"
+                                    x-text="lang === 'en' ? 'Group' : 'Grup'"></span>
                             </h3>
-                            <p class="text-[11px] text-emerald-100/80">Online • Siap dibagikan ke WhatsApp</p>
+                            <p class="text-[11px] text-emerald-100/80"
+                                x-text="lang === 'en' ? 'Online • Ready to share' : 'Online • Siap dibagikan ke WhatsApp'">
+                            </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1">
-                        <button 
-                            @click="showShareModal = false" 
-                            type="button" 
+                        <button @click="showShareModal = false" type="button"
                             class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition"
-                            title="Tutup">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            :title="t('cancel')">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
                         </button>
                     </div>
                 </div>
 
                 <!-- Tab Switcher: Teks WhatsApp vs Gambar Struk -->
-                <div class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
+                <div
+                    class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
                     <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200/70 w-full sm:w-auto">
-                        <button 
-                            type="button"
-                            @click="shareTab = 'text'" 
+                        <button type="button" @click="shareTab = 'text'"
                             :class="shareTab === 'text' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
                             class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
-                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            <span>Text</span>
+                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span x-text="t('textWaTab')"></span>
                         </button>
-                        <button 
-                            type="button"
-                            @click="shareTab = 'image'" 
+                        <button type="button" @click="shareTab = 'image'"
                             :class="shareTab === 'image' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
                             class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
-                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <span>Gambar</span>
+                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span x-text="t('receiptImageTab')"></span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Modal Body / Content -->
                 <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
-                    
+
                     <!-- TAB 1: Teks WhatsApp Preview (PERSIS sama seperti yang disalin) -->
                     <div x-show="shareTab === 'text'" class="space-y-2.5">
-                        <div class="text-xs px-1 font-semibold text-slate-700">
-                            Pratinjau Pesan Chat WhatsApp:
+                        <div class="text-xs px-1 font-semibold text-slate-700"
+                            x-text="lang === 'en' ? 'WhatsApp Message Preview:' : 'Pratinjau Pesan Chat WhatsApp:'">
                         </div>
 
                         <div class="flex justify-end">
-                            <div class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
-                                
-                                <div class="font-bold text-slate-950 text-sm">*RINCIAN PATUNGAN MAKANAN*</div>
+                            <div
+                                class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
+
+                                <div class="font-bold text-slate-950 text-sm" x-text="'*' + t('receiptHeader') + '*'">
+                                </div>
                                 <div class="text-slate-400 text-xs font-mono">─────────────────────────────</div>
 
                                 <!-- Ringkasan Tagihan -->
                                 <template x-if="parsedTotalPrice && parsedTotalAmount">
                                     <div class="space-y-0.5 text-xs text-slate-800">
-                                        <div class="font-bold text-slate-950">*Ringkasan Tagihan:*</div>
-                                        <div>• Total Menu Asli : Rp <span x-text="formatNumber(parsedTotalPrice)"></span></div>
-                                        <div>• Total Dibayar   : <strong class="font-bold text-slate-950">Rp <span x-text="formatNumber(parsedTotalAmount)"></span></strong></div>
-                                        <div>• Hemat Diskon    : <strong class="font-bold text-emerald-800">Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span x-text="discountPercentage"></span>% OFF)</strong></div>
-                                        <div class="text-slate-400 text-xs font-mono pt-0.5">─────────────────────────────</div>
+                                        <div class="font-bold text-slate-950" x-text="'*' + t('billSummary') + '*'">
+                                        </div>
+                                        <div>• <span x-text="t('menuTotal')"></span> Rp <span
+                                                x-text="formatNumber(parsedTotalPrice)"></span></div>
+                                        <div>• <span x-text="t('totalPaid')"></span>: <strong
+                                                class="font-bold text-slate-950">Rp <span
+                                                    x-text="formatNumber(parsedTotalAmount)"></span></strong></div>
+                                        <div>• <span x-text="t('discountSaving')"></span>: <strong
+                                                class="font-bold text-emerald-800">Rp <span
+                                                    x-text="formatNumber(totalDiscountAmount)"></span> (<span
+                                                    x-text="discountPercentage"></span>% <span
+                                                    x-text="t('off')"></span>)</strong></div>
+                                        <div class="text-slate-400 text-xs font-mono pt-0.5">
+                                            ─────────────────────────────</div>
                                     </div>
                                 </template>
 
                                 <!-- Per orang -->
                                 <div class="space-y-2 text-xs text-slate-800">
-                                    <div class="font-bold text-slate-950">*Rincian Bayar per Orang:*</div>
+                                    <div class="font-bold text-slate-950" x-text="'*' + t('breakdownPerPerson') + '*'">
+                                    </div>
                                     <template x-for="(person, idx) in activePersons" :key="person.id">
                                         <div class="pl-1">
-                                            <div class="font-bold text-slate-950"><span x-text="idx + 1"></span>. *<span x-text="person.name || ('Orang ' + (idx + 1))"></span>*</div>
-                                            <div class="text-slate-600 text-[11px] font-mono whitespace-pre">   ├ Harga Menu : Rp <span x-text="formatNumber(person.price)"></span></div>
+                                            <div class="font-bold text-slate-950"><span x-text="idx + 1"></span>. *<span
+                                                    x-text="person.name || ((lang === 'en' ? 'Person ' : 'Orang ') + (idx + 1))"></span>*
+                                            </div>
+                                            <div class="text-slate-600 text-[11px] font-mono whitespace-pre"> ├ <span
+                                                    x-text="t('menuPrice')"></span> Rp <span
+                                                    x-text="formatNumber(person.price)"></span></div>
                                             <template x-if="calculatePersonSaving(person) > 0">
-                                                <div class="text-emerald-800 text-[11px] font-mono whitespace-pre">   ├ Diskon     : Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span></div>
+                                                <div class="text-emerald-800 text-[11px] font-mono whitespace-pre"> ├
+                                                    <span
+                                                        x-text="lang === 'en' ? 'Discount   :' : 'Diskon     :'"></span>
+                                                    Rp <span
+                                                        x-text="formatNumber(calculatePersonSaving(person))"></span>
+                                                </div>
                                             </template>
-                                            <div class="font-bold text-emerald-950 text-xs font-mono whitespace-pre">   └ *Bayar      : Rp <span x-text="formatNumber(calculatePersonShare(person))"></span>*</div>
+                                            <div class="font-bold text-emerald-950 text-xs font-mono whitespace-pre"> └
+                                                *<span x-text="lang === 'en' ? 'Net Pay   :' : 'Bayar      :'"></span>
+                                                Rp <span x-text="formatNumber(calculatePersonShare(person))"></span>*
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
 
                                 <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
                                 <div class="font-bold text-slate-950 text-xs">
-                                    *TOTAL DITAGIH : Rp <span x-text="formatNumber(totalAllocatedShare)"></span>*
+                                    *<span x-text="t('totalBilled')"></span> : Rp <span
+                                        x-text="formatNumber(totalAllocatedShare)"></span>*
                                 </div>
 
                                 <!-- Norek section -->
                                 <template x-if="state.payment_info">
                                     <div class="pt-1 text-xs">
-                                        <div class="text-slate-400 text-xs font-mono pb-1">─────────────────────────────</div>
-                                        <div class="font-bold text-slate-950">*Info Pembayaran / Transfer:*</div>
-                                        <div class="mt-1 bg-white/80 p-2 rounded-lg font-mono text-xs select-all border border-emerald-600/10" x-text="state.payment_info">
+                                        <div class="text-slate-400 text-xs font-mono pb-1">─────────────────────────────
+                                        </div>
+                                        <div class="font-bold text-slate-950" x-text="'*' + t('paymentTransfer') + '*'">
+                                        </div>
+                                        <div class="mt-1 bg-white/80 p-2 rounded-lg font-mono text-xs select-all border border-emerald-600/10"
+                                            x-text="state.payment_info">
                                         </div>
                                     </div>
                                 </template>
@@ -639,8 +755,9 @@
                                 <div class="text-slate-400 text-xs font-mono pt-1">─────────────────────────────</div>
                                 <div class="text-[11px] text-slate-600 flex items-center justify-between pt-0.5">
                                     <div class="truncate">
-                                        <span class="text-slate-600 italic">Dihitung via: </span>
-                                        <span class="text-emerald-800 underline font-medium" x-text="currentAppUrl"></span>
+                                        <span class="text-slate-600 italic" x-text="t('calculatedVia') + ' '"></span>
+                                        <span class="text-emerald-800 underline font-medium"
+                                            x-text="currentAppUrl"></span>
                                     </div>
                                     <div class="flex items-center gap-1 text-[10px] text-slate-400 shrink-0">
                                         <span x-text="currentClock"></span>
@@ -653,69 +770,86 @@
 
                     <!-- TAB 2: Gambar Struk Card (Siap Diekspor PNG) -->
                     <div x-show="shareTab === 'image'" class="space-y-2.5">
-                        <div class="text-xs px-1 font-semibold text-slate-700">
-                            Pratinjau Foto Struk:
-                        </div>
+                        <div class="text-xs px-1 font-semibold text-slate-700" x-text="t('previewStruk')"></div>
 
                         <div class="flex justify-end">
-                            <div id="receipt-card" class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl p-4 pb-5 shadow-sm text-xs sm:text-sm font-sans space-y-2.5 border border-emerald-200/60 leading-relaxed relative box-border">
-                                
+                            <div id="receipt-card"
+                                class="w-full max-w-[96%] sm:max-w-[92%] bg-[#DCF8C6] text-slate-900 rounded-2xl p-4 pb-5 shadow-sm text-xs sm:text-sm font-sans space-y-2.5 border border-emerald-200/60 leading-relaxed relative box-border">
+
                                 <!-- Header Struk (Text murni, 100% sejajar di canvas) -->
-                                <div class="pb-2 border-b border-emerald-600/20 text-xs sm:text-sm font-extrabold text-emerald-950 uppercase tracking-wide flex items-center gap-1.5" style="line-height: 1.4;">
+                                <div class="pb-2 border-b border-emerald-600/20 text-xs sm:text-sm font-extrabold text-emerald-950 uppercase tracking-wide flex items-center gap-1.5"
+                                    style="line-height: 1.4;">
                                     <span class="text-emerald-700 text-sm sm:text-base leading-none">📄</span>
-                                    <span class="leading-none">RINCIAN PATUNGAN MAKANAN</span>
+                                    <span class="leading-none" x-text="t('receiptHeader')"></span>
                                 </div>
 
-                                <div class="bg-white/85 p-3 rounded-xl border border-emerald-600/10 text-xs space-y-1.5 shadow-xs">
-                                    <div class="text-slate-500 font-medium">Ringkasan Tagihan:</div>
+                                <div
+                                    class="bg-white/85 p-3 rounded-xl border border-emerald-600/10 text-xs space-y-1.5 shadow-xs">
+                                    <div class="text-slate-500 font-medium" x-text="t('billSummary')"></div>
                                     <div class="flex justify-between font-medium">
-                                        <span class="text-slate-700">Total Menu:</span>
-                                        <span class="font-semibold text-slate-900">Rp <span x-text="formatNumber(parsedTotalPrice)"></span></span>
+                                        <span class="text-slate-700" x-text="t('menuTotal')"></span>
+                                        <span class="font-semibold text-slate-900">Rp <span
+                                                x-text="formatNumber(parsedTotalPrice)"></span></span>
                                     </div>
                                     <div class="flex justify-between font-bold text-emerald-800">
-                                        <span>Total Dibayar:</span>
+                                        <span x-text="t('totalPaid')"></span>
                                         <span>Rp <span x-text="formatNumber(parsedTotalAmount)"></span></span>
                                     </div>
-                                    <div class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
-                                        <span>Hemat Diskon:</span>
-                                        <span>Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span x-text="discountPercentage"></span>% OFF)</span>
+                                    <div
+                                        class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
+                                        <span x-text="t('discountSaving')"></span>
+                                        <span>Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span
+                                                x-text="discountPercentage"></span>% <span
+                                                x-text="t('off')"></span>)</span>
                                     </div>
                                 </div>
 
                                 <div class="text-xs space-y-2 pt-1">
-                                    <div class="font-bold text-slate-800">Rincian Bayar per Orang:</div>
+                                    <div class="font-bold text-slate-800" x-text="t('breakdownPerPerson')"></div>
                                     <template x-for="(person, idx) in activePersons" :key="person.id">
                                         <div class="bg-white/90 p-2.5 rounded-xl border border-slate-100 shadow-sm">
                                             <div class="font-bold text-slate-900 flex items-center justify-between">
-                                                <span><span x-text="idx + 1"></span>. <span x-text="person.name || ('Orang ' + (idx + 1))"></span></span>
-                                                <span class="text-emerald-700 font-extrabold text-sm sm:text-base">Rp <span x-text="formatNumber(calculatePersonShare(person))"></span></span>
+                                                <span><span x-text="idx + 1"></span>. <span
+                                                        x-text="person.name || ((lang === 'en' ? 'Person ' : 'Orang ') + (idx + 1))"></span></span>
+                                                <span class="text-emerald-700 font-extrabold text-sm sm:text-base">Rp
+                                                    <span
+                                                        x-text="formatNumber(calculatePersonShare(person))"></span></span>
                                             </div>
                                             <div class="text-[11px] text-slate-500 flex justify-between mt-1">
-                                                <span>Harga Menu: Rp <span x-text="formatNumber(person.price)"></span></span>
-                                                <span class="text-emerald-600 font-semibold">Hemat: Rp <span x-text="formatNumber(calculatePersonSaving(person))"></span></span>
+                                                <span><span x-text="t('menuPrice')"></span> Rp <span
+                                                        x-text="formatNumber(person.price)"></span></span>
+                                                <span class="text-emerald-600 font-semibold"><span
+                                                        x-text="t('saved')"></span>: Rp <span
+                                                        x-text="formatNumber(calculatePersonSaving(person))"></span></span>
                                             </div>
                                         </div>
                                     </template>
                                 </div>
 
-                                <div class="p-2.5 bg-emerald-600 text-white font-extrabold rounded-xl flex justify-between items-center text-xs shadow-sm">
-                                    <span>TOTAL DITAGIH</span>
-                                    <span class="text-sm sm:text-base">Rp <span x-text="formatNumber(totalAllocatedShare)"></span></span>
+                                <div
+                                    class="p-2.5 bg-emerald-600 text-white font-extrabold rounded-xl flex justify-between items-center text-xs shadow-sm">
+                                    <span x-text="t('totalBilled')"></span>
+                                    <span class="text-sm sm:text-base">Rp <span
+                                            x-text="formatNumber(totalAllocatedShare)"></span></span>
                                 </div>
 
                                 <template x-if="state.payment_info">
                                     <div class="p-2.5 bg-white/90 rounded-xl text-xs border border-slate-100 shadow-sm">
-                                        <div class="font-bold text-slate-700">Info Pembayaran / Transfer:</div>
-                                        <div class="font-mono text-slate-800 text-[11px] mt-0.5" x-text="state.payment_info"></div>
+                                        <div class="font-bold text-slate-700" x-text="t('paymentTransfer')"></div>
+                                        <div class="font-mono text-slate-800 text-[11px] mt-0.5"
+                                            x-text="state.payment_info"></div>
                                     </div>
                                 </template>
 
                                 <!-- Footer Struk (Unicode murni, terjamin sejajar teks & tidak terpotong) -->
-                                <div class="pt-2.5 pb-1 border-t border-emerald-600/15 text-[11px] sm:text-xs flex items-center justify-between gap-2" style="line-height: 1.6;">
+                                <div class="pt-2.5 pb-1 border-t border-emerald-600/15 text-[11px] sm:text-xs flex items-center justify-between gap-2"
+                                    style="line-height: 1.6;">
                                     <div class="min-w-0 py-0.5" style="line-height: 1.6;">
                                         <span class="text-emerald-700">🔗</span>
-                                        <span class="text-slate-600 font-medium"> Dihitung via: </span>
-                                        <span class="text-emerald-800 font-semibold break-all" x-text="currentAppUrl"></span>
+                                        <span class="text-slate-600 font-medium"
+                                            x-text="' ' + t('calculatedVia') + ' '"></span>
+                                        <span class="text-emerald-800 font-semibold break-all"
+                                            x-text="currentAppUrl"></span>
                                     </div>
                                     <div class="shrink-0 text-[10px] text-slate-400 whitespace-nowrap pl-2">
                                         <span x-text="currentClock"></span>
@@ -733,23 +867,30 @@
                     <!-- Actions when in Text Tab -->
                     <template x-if="shareTab === 'text'">
                         <div class="flex flex-col sm:flex-row gap-2">
-                            <button 
-                                @click="copyToClipboard" 
-                                type="button" 
+                            <button @click="copyToClipboard" type="button"
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
-                                <svg x-show="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <svg x-show="!copied" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                <span x-text="copied ? 'Tersalin!' : 'Salin'"></span>
+                                <svg x-show="copied" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <svg x-show="!copied" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span
+                                    x-text="copied ? (lang === 'en' ? 'Copied!' : 'Tersalin!') : (lang === 'en' ? 'Copy Text' : 'Salin')"></span>
                             </button>
 
-                            <button 
-                                @click="openWhatsAppDirect" 
-                                type="button" 
+                            <button @click="openWhatsAppDirect" type="button"
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    <path
+                                        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
                                 </svg>
-                                <span>Kirim WA</span>
+                                <span x-text="lang === 'en' ? 'Open in WA' : 'Kirim WA'"></span>
                             </button>
                         </div>
                     </template>
@@ -757,23 +898,33 @@
                     <!-- Actions when in Image Tab -->
                     <template x-if="shareTab === 'image'">
                         <div class="flex flex-col sm:flex-row gap-2">
-                            <button 
-                                @click="copyImageReceipt" 
-                                type="button" 
-                                :disabled="copyingImage"
+                            <button @click="copyImageReceipt" type="button" :disabled="copyingImage"
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 transition flex items-center justify-center gap-2 shadow-sm active:scale-95 disabled:opacity-50">
-                                <svg x-show="copyingImage" class="w-4 h-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                <svg x-show="!copyingImage" class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                <span x-text="copyingImage ? 'Menyiapkan...' : 'Salin'"></span>
+                                <svg x-show="copyingImage" class="w-4 h-4 animate-spin text-emerald-700"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                <svg x-show="!copyingImage" class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span
+                                    x-text="copyingImage ? (lang === 'en' ? 'Preparing...' : 'Menyiapkan...') : t('copyImageBtn')"></span>
                             </button>
 
-                            <button 
-                                @click="downloadImageReceipt" 
-                                type="button" 
-                                :disabled="copyingImage"
+                            <button @click="downloadImageReceipt" type="button" :disabled="copyingImage"
                                 class="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-900 hover:bg-slate-800 text-white transition flex items-center justify-center gap-2 shadow-sm active:scale-95 disabled:opacity-50">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                <span>Unduh</span>
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span x-text="t('downloadImageBtn')"></span>
                             </button>
                         </div>
                     </template>
@@ -783,53 +934,66 @@
         </div>
 
         <!-- Action Sheet: Pilihan Kamera vs Galeri -->
-        <div 
-            x-show="showScanPickerModal" 
-            x-transition.opacity.duration.150ms
+        <div x-show="showScanPickerModal" x-transition.opacity.duration.150ms
             class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
-            
-            <div 
-                @click.outside="showScanPickerModal = false"
+
+            <div @click.outside="showScanPickerModal = false"
                 class="bg-white w-full max-w-sm rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200/90 overflow-hidden flex flex-col p-4 space-y-3 animate-in">
-                
+
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Pindai Struk</h3>
-                        <p class="text-xs text-slate-500">Pilih sumber foto struk pesanan</p>
+                        <h3 class="font-bold text-slate-900 text-sm" x-text="t('scanPickerTitle')">Pindai Struk</h3>
+                        <p class="text-xs text-slate-500" x-text="t('scanPickerSubtitle')">Pilih sumber foto struk
+                            pesanan</p>
                     </div>
-                    <button 
-                        @click="showScanPickerModal = false" 
-                        type="button" 
+                    <button @click="showScanPickerModal = false" type="button"
                         class="p-1 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition"
                         title="Tutup">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
                     </button>
                 </div>
 
                 <div class="space-y-2">
-                    <button 
-                        @click="showScanPickerModal = false; $refs.cameraInput.click()" 
-                        type="button" 
+                    <button @click="showScanPickerModal = false; $refs.cameraInput.click()" type="button"
                         class="w-full p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-left transition flex items-center gap-3 active:scale-[0.99]">
-                        <div class="w-10 h-10 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-xs sm:text-sm text-slate-900">Buka Kamera</div>
-                            <div class="text-[11px] text-slate-500">Ambil foto struk langsung</div>
+                            <div class="font-semibold text-xs sm:text-sm text-slate-900" x-text="t('openCamera')">Buka
+                                Kamera</div>
+                            <div class="text-[11px] text-slate-500" x-text="t('openCameraDesc')">Ambil foto struk
+                                langsung</div>
                         </div>
                     </button>
 
-                    <button 
-                        @click="showScanPickerModal = false; $refs.galleryInput.click()" 
-                        type="button" 
+                    <button @click="showScanPickerModal = false; $refs.galleryInput.click()" type="button"
                         class="w-full p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-left transition flex items-center gap-3 active:scale-[0.99]">
-                        <div class="w-10 h-10 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-xs sm:text-sm text-slate-900">Pilih dari Galeri</div>
-                            <div class="text-[11px] text-slate-500">Unggah foto atau tangkapan layar</div>
+                            <div class="font-semibold text-xs sm:text-sm text-slate-900" x-text="t('chooseGallery')">
+                                Pilih dari Galeri</div>
+                            <div class="text-[11px] text-slate-500" x-text="t('chooseGalleryDesc')">Unggah foto atau
+                                tangkapan layar</div>
                         </div>
                     </button>
                 </div>
@@ -838,42 +1002,52 @@
         </div>
 
         <!-- Modal Hasil Pindai Struk OCR -->
-        <div 
-            x-show="showOcrModal" 
-            x-transition.opacity.duration.150ms
+        <div x-show="showOcrModal" x-transition.opacity.duration.150ms
             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div 
-                @click.outside="showOcrModal = false"
+            <div @click.outside="showOcrModal = false"
                 class="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
-                
+
                 <!-- Header -->
-                <div class="px-5 py-3.5 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
+                <div
+                    class="px-5 py-3.5 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        <div
+                            class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 leading-tight">Hasil Pindai Struk</h3>
-                            <p class="text-xs text-slate-500">Periksa dan sesuaikan data sebelum diterapkan</p>
+                            <h3 class="font-bold text-sm text-slate-900 leading-tight" x-text="t('ocrModalTitle')">Hasil
+                                Pindai Struk</h3>
+                            <p class="text-xs text-slate-500" x-text="t('ocrModalSubtitle')">Periksa dan sesuaikan data
+                                sebelum diterapkan</p>
                         </div>
                     </div>
 
-                    <button 
-                        @click="showOcrModal = false" 
-                        type="button" 
+                    <button @click="showOcrModal = false" type="button"
                         class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition"
                         title="Tutup">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
                     </button>
                 </div>
 
                 <!-- Modal Body -->
                 <div class="p-4 overflow-y-auto space-y-4 flex-1 bg-slate-50/50">
-                    
+
                     <!-- Scanning State -->
                     <template x-if="ocrScanning">
                         <div class="py-12 text-center space-y-4">
-                            <div class="w-28 h-36 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative">
+                            <div
+                                class="w-28 h-36 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative">
                                 <img :src="ocrPreviewUrl" class="w-full h-full object-cover" alt="Preview Struk">
                             </div>
 
@@ -883,7 +1057,8 @@
                                     <span class="text-slate-900 font-mono"><span x-text="ocrProgress"></span>%</span>
                                 </div>
                                 <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-brand-500 h-full rounded-full transition-all duration-200" :style="'width: ' + ocrProgress + '%'"></div>
+                                    <div class="bg-brand-500 h-full rounded-full transition-all duration-200"
+                                        :style="'width: ' + ocrProgress + '%'"></div>
                                 </div>
                             </div>
                         </div>
@@ -895,58 +1070,50 @@
                             <!-- Tab Switcher -->
                             <div class="flex items-center justify-between gap-2">
                                 <div class="inline-flex bg-slate-200/70 p-1 rounded-xl text-xs font-semibold">
-                                    <button 
-                                        @click="ocrTab = 'result'" 
-                                        type="button" 
+                                    <button @click="ocrTab = 'result'" type="button"
                                         :class="ocrTab === 'result' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
-                                        class="px-3 py-1.5 rounded-lg transition">
+                                        class="px-3 py-1.5 rounded-lg transition" x-text="t('detectedTab')">
                                         Hasil Deteksi
                                     </button>
-                                    <button 
-                                        @click="ocrTab = 'raw'" 
-                                        type="button" 
+                                    <button @click="ocrTab = 'raw'" type="button"
                                         :class="ocrTab === 'raw' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
-                                        class="px-3 py-1.5 rounded-lg transition">
+                                        class="px-3 py-1.5 rounded-lg transition" x-text="t('rawTextTab')">
                                         Teks Mentah
                                     </button>
                                 </div>
 
-                                <button 
-                                    @click="showOcrModal = false; showScanPickerModal = true" 
-                                    type="button" 
+                                <button @click="showOcrModal = false; showScanPickerModal = true" type="button"
                                     class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg transition shadow-2xs flex items-center gap-1">
-                                    <span>Ganti Foto</span>
+                                    <span x-text="t('changePhoto')">Ganti Foto</span>
                                 </button>
                             </div>
 
                             <!-- Tab 1: Form Hasil Ekstraksi -->
                             <div x-show="ocrTab === 'result'" class="space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-                                        <label class="text-[11px] font-semibold text-slate-500">Total Sebelum Diskon</label>
+                                    <div
+                                        class="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
+                                        <label class="text-[11px] font-semibold text-slate-500"
+                                            x-text="t('totalBeforeDiscount')">Total Sebelum Diskon</label>
                                         <div class="relative">
-                                            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
-                                            <input 
-                                                type="text" 
-                                                inputmode="numeric"
-                                                x-model="ocrResult.subtotal" 
-                                                placeholder="Contoh: 120.000"
-                                                @keypress="numberOnly($event)"
+                                            <span
+                                                class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                            <input type="text" inputmode="numeric" x-model="ocrResult.subtotal"
+                                                placeholder="Contoh: 120.000" @keypress="numberOnly($event)"
                                                 @input="onFormatInput($event, ocrResult, 'subtotal')"
                                                 class="w-full pl-8 pr-2.5 py-1.5 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-brand-500">
                                         </div>
                                     </div>
 
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-                                        <label class="text-[11px] font-semibold text-slate-500">Total Akhir Dibayar</label>
+                                    <div
+                                        class="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
+                                        <label class="text-[11px] font-semibold text-slate-500"
+                                            x-text="t('totalPaid')">Total Akhir Dibayar</label>
                                         <div class="relative">
-                                            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-brand-600">Rp</span>
-                                            <input 
-                                                type="text" 
-                                                inputmode="numeric"
-                                                x-model="ocrResult.total" 
-                                                placeholder="Contoh: 75.000"
-                                                @keypress="numberOnly($event)"
+                                            <span
+                                                class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-brand-600">Rp</span>
+                                            <input type="text" inputmode="numeric" x-model="ocrResult.total"
+                                                placeholder="Contoh: 75.000" @keypress="numberOnly($event)"
                                                 @input="onFormatInput($event, ocrResult, 'total')"
                                                 class="w-full pl-8 pr-2.5 py-1.5 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-brand-500">
                                         </div>
@@ -954,54 +1121,55 @@
                                 </div>
 
                                 <!-- Menu Items list -->
-                                <div class="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5">
+                                <div
+                                    class="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5">
                                     <div class="flex items-center justify-between">
-                                        <div class="text-xs font-bold text-slate-700">
-                                            <span>Menu Terdeteksi (</span>
+                                        <div class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                            <span x-text="t('detectedMenus')">Menu Terdeteksi</span>
+                                            <span>(</span>
                                             <span x-text="ocrResult.items.length"></span>
                                             <span>):</span>
                                         </div>
-                                        <button 
-                                            @click="addOcrItem" 
-                                            type="button" 
+                                        <button @click="addOcrItem" type="button"
                                             class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-2 py-1 rounded-md transition flex items-center gap-1">
-                                            <span>+ Tambah</span>
+                                            <span x-text="t('addMenuBtn')">+ Tambah</span>
                                         </button>
                                     </div>
 
                                     <template x-if="ocrResult.items.length === 0">
-                                        <div class="py-4 text-center text-xs text-slate-400">
-                                            Tidak ada menu yang terbaca otomatis. Silakan tambah manual atau cek tab Teks Mentah.
+                                        <div class="py-4 text-center text-xs text-slate-400"
+                                            x-text="t('noMenuDetected')">
+                                            Tidak ada menu yang terbaca otomatis. Silakan tambah manual atau cek tab
+                                            Teks Mentah.
                                         </div>
                                     </template>
 
                                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
                                         <template x-for="(it, idx) in ocrResult.items" :key="idx">
-                                            <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                                <input 
-                                                    type="text" 
-                                                    x-model="it.name" 
-                                                    placeholder="Nama Menu" 
+                                            <div
+                                                class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                                <input type="text" x-model="it.name" :placeholder="t('itemPlaceholder')"
                                                     class="flex-1 px-2.5 py-1.5 text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
-                                                
+
                                                 <div class="relative w-28 shrink-0">
-                                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
-                                                    <input 
-                                                        type="text" 
-                                                        inputmode="numeric"
-                                                        x-model="it.price" 
-                                                        placeholder="Harga" 
+                                                    <span
+                                                        class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
+                                                    <input type="text" inputmode="numeric" x-model="it.price"
+                                                        :placeholder="t('pricePlaceholder')"
                                                         @keypress="numberOnly($event)"
                                                         @input="onFormatInput($event, it, 'price')"
                                                         class="w-full pl-6 pr-2 py-1.5 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
                                                 </div>
 
-                                                <button 
-                                                    @click="removeOcrItem(idx)" 
-                                                    type="button" 
-                                                    class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" 
+                                                <button @click="removeOcrItem(idx)" type="button"
+                                                    class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                                                     title="Hapus baris">
-                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </template>
@@ -1011,10 +1179,8 @@
 
                             <!-- Tab 2: Raw OCR Text -->
                             <div x-show="ocrTab === 'raw'" class="space-y-2">
-                                <textarea 
-                                    x-model="ocrResult.rawText" 
-                                    rows="9" 
-                                    class="w-full p-3 font-mono text-xs text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-brand-500 leading-relaxed select-all" 
+                                <textarea x-model="ocrResult.rawText" rows="9"
+                                    class="w-full p-3 font-mono text-xs text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-brand-500 leading-relaxed select-all"
                                     readonly>
                                 </textarea>
                             </div>
@@ -1025,21 +1191,21 @@
                 </div>
 
                 <!-- Modal Actions -->
-                <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 shrink-0 flex items-center justify-between gap-2">
-                    <button 
-                        @click="showOcrModal = false" 
-                        type="button" 
-                        class="px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                <div
+                    class="p-3.5 sm:p-4 bg-white border-t border-slate-200 shrink-0 flex items-center justify-between gap-2">
+                    <button @click="showOcrModal = false" type="button"
+                        class="px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                        x-text="t('cancel')">
                         Batal
                     </button>
 
-                    <button 
-                        @click="applyOcrToCalculator" 
-                        type="button" 
-                        :disabled="ocrScanning"
+                    <button @click="applyOcrToCalculator" type="button" :disabled="ocrScanning"
                         class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white shadow-sm transition flex items-center justify-center gap-1.5 active:scale-95">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>Terapkan ke Kalkulator</span>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span x-text="t('applyToCalculator')">Terapkan ke Kalkulator</span>
                     </button>
                 </div>
 
@@ -1047,9 +1213,7 @@
         </div>
 
         <!-- Toast Notification -->
-        <div 
-            x-show="toastMessage" 
-            x-transition.opacity.duration.200ms
+        <div x-show="toastMessage" x-transition.opacity.duration.200ms
             class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold shadow-xl border border-slate-700/50 flex items-center gap-2">
             <span x-text="toastMessage"></span>
         </div>
@@ -1057,13 +1221,164 @@
     </div>
 
     <script>
+        const I18N = {
+            id: {
+                appSubtitle: "Bagi Tagihan & Diskon Makanan Adil",
+                scanReceipt: "Scan Struk",
+                reset: "Reset",
+                resetConfirm: "Yakin ingin mengosongkan perhitungan?",
+                resetToast: "Perhitungan berhasil di-reset",
+                receiptParams: "Parameter Struk Pesanan",
+                useMenuSum: "Gunakan Total Menu",
+                totalBeforeDiscount: "1. Total Sebelum Diskon",
+                receiptOriginal: "(Struk Asli)",
+                totalPaid: "2. Total Akhir Dibayar",
+                afterVoucher: "(Setelah Voucher)",
+                discountSaving: "Total Penghematan Diskon",
+                saved: "Hemat",
+                off: "OFF",
+                payRatio: "Rasio Bayar",
+                ofMenuPrice: "dari harga menu",
+                menuAndDiners: "Daftar Menu & Pemesan",
+                menuDinersSubtitle: "Tiap orang bayar proporsional sesuai porsi diskon",
+                itemPlaceholder: "Nama / Menu",
+                pricePlaceholder: "Harga menu",
+                netPay: "Bayar Bersih",
+                addMenu: "Tambah Menu / Teman Lain",
+                statusValidation: "Status Validasi & Pembulatan",
+                exact100: "Pas 100%",
+                diffLabel: "Selisih",
+                receiptTotal: "Total Bayar Struk",
+                splitResultTotal: "Total Hasil Bagi",
+                roundingDiff: "Selisih (Rounding)",
+                fixRoundingBtn: "Pas-kan",
+                roundingNote: "terjadi akibat pembulatan per item. Klik untuk menyerap selisih ke item pertama.",
+                paymentInfoTitle: "Tujuan Transfer / Info Pembayaran (Opsional)",
+                paymentInfoPlaceholder: "Contoh: BCA 1234567890 a.n Budi / GoPay 08123456789",
+                paymentInfoHint: "Masuk ke teks WA",
+                totalSummary: "Rangkuman Patungan",
+                shareBtn: "Bagikan Hasil Patungan",
+                copyLink: "Salin Link Web",
+                linkCopiedToast: "Link website disalin ke clipboard!",
+                shareModalTitle: "Bagikan Rincian Patungan",
+                shareModalSubtitle: "Kirim ke WhatsApp atau unduh sebagai gambar struk",
+                textWaTab: "Teks WhatsApp",
+                receiptImageTab: "Gambar Struk",
+                copyTextBtn: "Salin Teks Pesan",
+                openWaBtn: "Buka di WhatsApp",
+                copyImageBtn: "Salin Gambar",
+                downloadImageBtn: "Unduh Gambar Struk",
+                scanPickerTitle: "Pindai Struk Pesanan",
+                scanPickerSubtitle: "Pilih cara mengunggah struk atau invoice makanan",
+                openCamera: "Buka Kamera",
+                openCameraDesc: "Ambil foto struk langsung",
+                chooseGallery: "Pilih dari Galeri",
+                chooseGalleryDesc: "Unggah foto atau tangkapan layar",
+                ocrModalTitle: "Hasil Pindai Struk",
+                ocrModalSubtitle: "Periksa dan sesuaikan data sebelum diterapkan",
+                detectedTab: "Hasil Deteksi",
+                rawTextTab: "Teks Mentah",
+                changePhoto: "Ganti Foto",
+                detectedMenus: "Menu Terdeteksi",
+                addMenuBtn: "+ Tambah",
+                noMenuDetected: "Tidak ada menu yang terbaca otomatis. Silakan tambah manual atau cek tab Teks Mentah.",
+                applyToCalculator: "Terapkan ke Kalkulator",
+                cancel: "Batal",
+                ocrAppliedToast: "Data struk berhasil dimasukkan ke kalkulator!",
+                receiptHeader: "RINCIAN PATUNGAN MAKANAN",
+                billSummary: "Ringkasan Tagihan:",
+                menuTotal: "Total Menu:",
+                breakdownPerPerson: "Rincian Bayar per Orang:",
+                menuPrice: "Harga Menu:",
+                totalBilled: "TOTAL DITAGIH",
+                paymentTransfer: "Info Pembayaran / Transfer:",
+                calculatedVia: "Dihitung via:",
+                previewStruk: "Pratinjau Foto Struk:"
+            },
+            en: {
+                appSubtitle: "Fair & Proportional Food Bill Splitter",
+                scanReceipt: "Scan Receipt",
+                reset: "Reset",
+                resetConfirm: "Clear current calculation?",
+                resetToast: "Calculation cleared",
+                receiptParams: "Receipt Parameters",
+                useMenuSum: "Use Menu Total",
+                totalBeforeDiscount: "1. Total Before Discount",
+                receiptOriginal: "(Original Receipt)",
+                totalPaid: "2. Final Amount Paid",
+                afterVoucher: "(After Voucher)",
+                discountSaving: "Total Discount Savings",
+                saved: "Saved",
+                off: "OFF",
+                payRatio: "Payment Ratio",
+                ofMenuPrice: "of menu total",
+                menuAndDiners: "Menu Items & Diners",
+                menuDinersSubtitle: "Each person pays proportionally based on their discount share",
+                itemPlaceholder: "Name / Item",
+                pricePlaceholder: "Item price",
+                netPay: "Net Payable",
+                addMenu: "Add Item / Person",
+                statusValidation: "Validation & Rounding Status",
+                exact100: "Exact 100%",
+                diffLabel: "Difference",
+                receiptTotal: "Receipt Total",
+                splitResultTotal: "Split Total",
+                roundingDiff: "Rounding Difference",
+                fixRoundingBtn: "Adjust",
+                roundingNote: "due to per-item rounding. Click to adjust to the first item.",
+                paymentInfoTitle: "Transfer Destination / Payment Info (Optional)",
+                paymentInfoPlaceholder: "E.g., Bank / E-Wallet 08123456789 a.n John",
+                paymentInfoHint: "Appears in WA message",
+                totalSummary: "Bill Summary",
+                shareBtn: "Share Bill Breakdown",
+                copyLink: "Copy App Link",
+                linkCopiedToast: "App link copied to clipboard!",
+                shareModalTitle: "Share Bill Breakdown",
+                shareModalSubtitle: "Send via WhatsApp or download as receipt image",
+                textWaTab: "WhatsApp Text",
+                receiptImageTab: "Receipt Image",
+                copyTextBtn: "Copy Text Message",
+                openWaBtn: "Open in WhatsApp",
+                copyImageBtn: "Copy Image",
+                downloadImageBtn: "Download Receipt Image",
+                scanPickerTitle: "Scan Order Receipt",
+                scanPickerSubtitle: "Choose how to upload your food receipt or invoice",
+                openCamera: "Open Camera",
+                openCameraDesc: "Take a photo of the receipt",
+                chooseGallery: "Choose from Gallery",
+                chooseGalleryDesc: "Upload photo or screenshot",
+                ocrModalTitle: "Receipt Scan Result",
+                ocrModalSubtitle: "Review and adjust details before applying",
+                detectedTab: "Detected Data",
+                rawTextTab: "Raw Text",
+                changePhoto: "Change Photo",
+                detectedMenus: "Detected Items",
+                addMenuBtn: "+ Add",
+                noMenuDetected: "No items detected automatically. Please add manually or check the Raw Text tab.",
+                applyToCalculator: "Apply to Calculator",
+                cancel: "Cancel",
+                ocrAppliedToast: "Receipt data applied to calculator!",
+                receiptHeader: "FOOD BILL SPLIT DETAILS",
+                billSummary: "Bill Summary:",
+                menuTotal: "Total Menu:",
+                breakdownPerPerson: "Payment Breakdown per Person:",
+                menuPrice: "Item Price:",
+                totalBilled: "TOTAL BILLED",
+                paymentTransfer: "Payment / Transfer Info:",
+                calculatedVia: "Calculated via:",
+                previewStruk: "Receipt Photo Preview:"
+            }
+        };
+
         function calculator() {
             const STORAGE_KEY = 'bagi_promo_v2';
+            const LANG_KEY = 'bagi_promo_lang';
             const STATS_KEY = 'bagi_promo_lifetime_stats';
             const KV_BUCKET = 'Lm8Q83y1s7Tt7Cn41FQvJk';
             const KV_URL = `https://kvdb.io/${KV_BUCKET}/stats`;
 
             return {
+                lang: 'id',
                 state: {
                     persons: [
                         { id: 1, name: 'Orang 1', price: null, roundingAdjustment: 0 },
@@ -1102,11 +1417,27 @@
                 },
 
                 init() {
+                    const savedLang = localStorage.getItem(LANG_KEY);
+                    if (savedLang === 'id' || savedLang === 'en') {
+                        this.lang = savedLang;
+                    }
                     this.loadFromStorage();
                     this.loadStats();
                     this.$watch('state', () => {
                         this.saveToStorage();
                     });
+                },
+
+                setLanguage(l) {
+                    this.lang = l;
+                    try {
+                        localStorage.setItem(LANG_KEY, l);
+                    } catch (e) { }
+                },
+
+                t(key) {
+                    const dict = I18N[this.lang] || I18N.id;
+                    return dict[key] || I18N.id[key] || key;
                 },
 
                 // Helper: trigger notification toast
@@ -1281,7 +1612,7 @@
                             this.stats.totalSaved = Math.max(this.stats.totalSaved, Number(data.totalSaved) || 0);
                             this.stats.count = Math.max(this.stats.count, Number(data.count) || 0);
                         }
-                    } catch (e) {}
+                    } catch (e) { }
 
                     try {
                         const res = await fetch(KV_URL);
@@ -1294,12 +1625,12 @@
                                 localStorage.setItem(STATS_KEY, JSON.stringify(this.stats));
                             }
                         }
-                    } catch (err) {}
+                    } catch (err) { }
                 },
                 async saveStats() {
                     try {
                         localStorage.setItem(STATS_KEY, JSON.stringify(this.stats));
-                    } catch (e) {}
+                    } catch (e) { }
 
                     try {
                         await fetch(KV_URL, {
@@ -1311,7 +1642,7 @@
                                 count: this.stats.count
                             })
                         });
-                    } catch (err) {}
+                    } catch (err) { }
                 },
                 recordCalculation() {
                     if (!this.isValidParameters) return;
@@ -1329,16 +1660,16 @@
 
                 // Reset
                 resetAll() {
-                    if (confirm('Yakin ingin mengosongkan perhitungan?')) {
+                    if (confirm(this.t('resetConfirm'))) {
                         this.state.persons = [
-                            { id: 1, name: 'Orang 1', price: null, roundingAdjustment: 0 },
-                            { id: 2, name: 'Orang 2', price: null, roundingAdjustment: 0 }
+                            { id: 1, name: this.lang === 'en' ? 'Person 1' : 'Orang 1', price: null, roundingAdjustment: 0 },
+                            { id: 2, name: this.lang === 'en' ? 'Person 2' : 'Orang 2', price: null, roundingAdjustment: 0 }
                         ];
                         this.state.total_price = null;
                         this.state.total_ammount = null;
                         // Info pembayaran sengaja dipertahankan agar tidak perlu mengetik ulang
                         this.saveToStorage();
-                        this.showToast('Perhitungan berhasil di-reset');
+                        this.showToast(this.t('resetToast'));
                     }
                 },
 
@@ -1346,7 +1677,7 @@
                 async copyAppUrl() {
                     try {
                         await navigator.clipboard.writeText(this.currentAppUrl);
-                        this.showToast('Link website disalin ke clipboard!');
+                        this.showToast(this.t('linkCopiedToast'));
                         if (typeof confetti === 'function') {
                             confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
                         }
@@ -1359,19 +1690,20 @@
                 generateWhatsAppMessage() {
                     const lines = [];
                     const url = this.currentAppUrl;
+                    const isEn = this.lang === 'en';
 
-                    lines.push('*RINCIAN PATUNGAN MAKANAN*');
+                    lines.push(isEn ? '*FOOD BILL SPLIT DETAILS*' : '*RINCIAN PATUNGAN MAKANAN*');
                     lines.push('─────────────────────────────');
-                    
+
                     if (this.parsedTotalPrice && this.parsedTotalAmount) {
-                        lines.push('*Ringkasan Tagihan:*');
-                        lines.push(`• Total Menu Asli : Rp ${this.formatNumber(this.parsedTotalPrice)}`);
-                        lines.push(`• Total Dibayar   : *Rp ${this.formatNumber(this.parsedTotalAmount)}*`);
-                        lines.push(`• Hemat Diskon    : *Rp ${this.formatNumber(this.totalDiscountAmount)} (${this.discountPercentage}% OFF)*`);
+                        lines.push(isEn ? '*Bill Summary:*' : '*Ringkasan Tagihan:*');
+                        lines.push(`• ${isEn ? 'Original Menu' : 'Total Menu Asli'} : Rp ${this.formatNumber(this.parsedTotalPrice)}`);
+                        lines.push(`• ${isEn ? 'Amount Paid' : 'Total Dibayar'}   : *Rp ${this.formatNumber(this.parsedTotalAmount)}*`);
+                        lines.push(`• ${isEn ? 'Discount Savings' : 'Hemat Diskon'}    : *Rp ${this.formatNumber(this.totalDiscountAmount)} (${this.discountPercentage}% OFF)*`);
                         lines.push('─────────────────────────────');
                     }
 
-                    lines.push('*Rincian Bayar per Orang:*');
+                    lines.push(isEn ? '*Payment Breakdown per Person:*' : '*Rincian Bayar per Orang:*');
                     let count = 0;
 
                     this.state.persons.forEach((p, idx) => {
@@ -1380,29 +1712,30 @@
                             count++;
                             const share = this.calculatePersonShare(p);
                             const saving = this.calculatePersonSaving(p);
-                            const name = p.name ? p.name.trim() : `Orang ${idx + 1}`;
-                            
+                            const defaultName = isEn ? `Person ${idx + 1}` : `Orang ${idx + 1}`;
+                            const name = p.name ? p.name.trim() : defaultName;
+
                             lines.push(`\n${count}. *${name}*`);
-                            lines.push(`   ├ Harga Menu : Rp ${this.formatNumber(price)}`);
+                            lines.push(`   ├ ${isEn ? 'Menu Price' : 'Harga Menu'} : Rp ${this.formatNumber(price)}`);
                             if (saving > 0) {
-                                lines.push(`   ├ Diskon     : Rp ${this.formatNumber(saving)}`);
+                                lines.push(`   ├ ${isEn ? 'Discount' : 'Diskon'}     : Rp ${this.formatNumber(saving)}`);
                             }
-                            lines.push(`   └ *Bayar      : Rp ${this.formatNumber(share)}*`);
+                            lines.push(`   └ *${isEn ? 'Net Pay' : 'Bayar'}      : Rp ${this.formatNumber(share)}*`);
                         }
                     });
 
                     lines.push('\n─────────────────────────────');
-                    lines.push(`*TOTAL DITAGIH : Rp ${this.formatNumber(this.totalAllocatedShare)}*`);
+                    lines.push(`*${isEn ? 'TOTAL BILLED' : 'TOTAL DITAGIH'} : Rp ${this.formatNumber(this.totalAllocatedShare)}*`);
 
                     if (this.state.payment_info && this.state.payment_info.trim()) {
                         lines.push('\n─────────────────────────────');
-                        lines.push('*Info Pembayaran / Transfer:*');
+                        lines.push(isEn ? '*Payment / Transfer Info:*' : '*Info Pembayaran / Transfer:*');
                         lines.push(this.state.payment_info.trim());
                     }
 
                     lines.push('\n─────────────────────────────');
-                    lines.push('_Dihitung via:_ ' + url);
-                    
+                    lines.push((isEn ? '_Calculated with:_ ' : '_Dihitung via:_ ') + url);
+
                     return lines.join('\n');
                 },
 
@@ -1640,7 +1973,7 @@
                                     d[i + 2] = finalVal;
                                 }
                                 ctx.putImageData(imgData, 0, 0);
-                            } catch (e) {}
+                            } catch (e) { }
                             resolve(canvas.toDataURL('image/png'));
                         };
                         img.src = dataUrl;
@@ -1783,4 +2116,5 @@
         }
     </script>
 </body>
-</html>\n
+
+</html>
