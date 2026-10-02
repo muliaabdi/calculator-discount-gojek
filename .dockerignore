@@ -1,0 +1,7 @@
+.git
+.gitignore
+.kilo
+.agents
+.gemini
+node_modules
+README.md
