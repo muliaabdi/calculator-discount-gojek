@@ -96,5 +96,8 @@ Akses melalui `http://localhost:3000`.
 
 ---
 
+## Kredit & Atribusi
+Proyek ini dikembangkan dari ide dan basis awal [armnugraha/calculator-discount-gojek](https://github.com/armnugraha/calculator-discount-gojek) dengan refaktorisasi arsitektur ke Alpine.js, penambahan modul OCR pemindai struk lokal, koreksi pembulatan otomatis, dan optimasi mobile.
+
 ## Lisensi
 [MIT](LICENSE)
