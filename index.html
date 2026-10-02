@@ -528,57 +528,22 @@
                     <!-- Modal Body / Content -->
                     <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
                         
-                        <!-- Mode 1: WhatsApp Chat Bubble Simulation -->
+                        <!-- Mode 1: WhatsApp Chat Bubble Simulation (Identik 100% dengan WhatsApp) -->
                         <div v-if="modalView === 'chat'" class="flex justify-end">
-                            <div class="max-w-[95%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans space-y-2 border border-emerald-200/60 leading-relaxed relative">
+                            <div class="max-w-[95%] sm:max-w-[90%] bg-[#DCF8C6] text-slate-900 rounded-2xl rounded-tr-none p-3.5 shadow-sm text-xs sm:text-sm font-sans border border-emerald-200/60 relative">
                                 
-                                <div class="font-bold text-emerald-900 flex items-center gap-1.5 pb-1 border-b border-emerald-600/10">
-                                    <svg class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                    <span>RINCIAN PATUNGAN MAKANAN</span>
+                                <!-- Link Preview Box di bagian atas persis seperti WhatsApp -->
+                                <div class="bg-black/5 rounded-xl p-2.5 mb-2.5 border-l-4 border-emerald-700 text-xs select-none">
+                                    <div class="font-bold text-emerald-950 truncate">{{ currentAppUrl.replace('https://', '').replace('/', '') }}</div>
+                                    <div class="text-[11px] text-slate-600 truncate">{{ currentAppUrl }}</div>
                                 </div>
 
-                                <div class="bg-white/80 p-2.5 rounded-xl border border-emerald-600/10 text-xs space-y-1">
-                                    <div class="text-slate-500 font-medium">Ringkasan Tagihan:</div>
-                                    <div class="flex justify-between font-medium"><span>Total Menu:</span> <span>Rp {{ formatNumber(parsedTotalPrice) }}</span></div>
-                                    <div class="flex justify-between font-bold text-emerald-800"><span>Total Dibayar:</span> <span>Rp {{ formatNumber(parsedTotalAmount) }}</span></div>
-                                    <div class="flex justify-between font-bold text-brand-600 pt-0.5 border-t border-slate-100">
-                                        <span>Hemat Diskon:</span>
-                                        <span>Rp {{ formatNumber(totalDiscountAmount) }} ({{ discountPercentage }}% OFF)</span>
-                                    </div>
-                                </div>
+                                <!-- Pesan Teks Asli WhatsApp (WYSIWYG) -->
+                                <div class="whitespace-pre-wrap font-sans text-slate-900 text-xs sm:text-sm leading-relaxed" v-html="formattedBubbleHtml"></div>
 
-                                <div class="text-xs space-y-2 pt-1">
-                                    <div class="font-bold text-slate-800">Rincian Bayar per Orang:</div>
-                                    <div v-for="(person, idx) in activePersons" :key="person.id" class="bg-white/90 p-2 rounded-lg border border-slate-100">
-                                        <div class="font-bold text-slate-900 flex items-center justify-between">
-                                            <span>{{ idx + 1 }}. {{ person.name || ('Orang ' + (idx + 1)) }}</span>
-                                            <span class="text-emerald-700 font-extrabold text-sm">Rp {{ formatNumber(calculatePersonShare(person)) }}</span>
-                                        </div>
-                                        <div class="text-[11px] text-slate-500 flex justify-between mt-0.5">
-                                            <span>Harga Menu: Rp {{ formatNumber(person.price) }}</span>
-                                            <span class="text-emerald-600 font-medium">Hemat: Rp {{ formatNumber(calculatePersonSaving(person)) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="p-2 bg-emerald-600 text-white font-extrabold rounded-lg flex justify-between items-center text-xs">
-                                    <span>TOTAL DITAGIH</span>
-                                    <span class="text-sm">Rp {{ formatNumber(totalAllocatedShare) }}</span>
-                                </div>
-
-                                <div v-if="state.payment_info" class="p-2 bg-white/90 rounded-lg text-xs border border-slate-100">
-                                    <div class="font-bold text-slate-700">Info Pembayaran:</div>
-                                    <div class="font-mono text-slate-800 text-[11px] mt-0.5">{{ state.payment_info }}</div>
-                                </div>
-
-                                <div class="pt-1 border-t border-emerald-600/10 text-[11px] text-slate-500">
-                                    <div class="font-semibold text-slate-700">Link kalkulator:</div>
-                                    <a :href="currentAppUrl" target="_blank" class="text-emerald-700 underline break-all font-mono">{{ currentAppUrl }}</a>
-                                </div>
-
-                                <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 pt-1">
+                                <div class="flex justify-end items-center gap-1 text-[10px] text-slate-500 pt-2">
                                     <span>{{ currentClock }}</span>
-                                    <span class="text-sky-500 font-bold">✓✓</span>
+                                    <span class="text-sky-600 font-bold">✓✓</span>
                                 </div>
                             </div>
                         </div>
@@ -983,6 +948,18 @@
                     return lines.join('\n');
                 };
 
+                // Formatted HTML for WhatsApp bubble to match actual WhatsApp output 100%
+                const formattedBubbleHtml = computed(() => {
+                    let msg = generateWhatsAppMessage();
+                    // Escape HTML characters
+                    msg = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    // Convert *bold* to <strong>
+                    msg = msg.replace(/\*([^\*\n]+)\*/g, '<strong class="font-bold text-slate-950">$1</strong>');
+                    // Convert URLs to clickable links
+                    msg = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-emerald-700 underline break-all font-medium">$1</a>');
+                    return msg;
+                });
+
                 const openShareModal = () => {
                     recordCalculation();
                     showShareModal.value = true;
@@ -1026,6 +1003,7 @@
                     stats,
                     showShareModal,
                     modalView,
+                    formattedBubbleHtml,
                     copied,
                     toastMessage,
                     currentClock,
