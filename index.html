@@ -1178,10 +1178,21 @@
                             </div>
 
                             <!-- Tab 2: Raw OCR Text -->
-                            <div x-show="ocrTab === 'raw'" class="space-y-2">
-                                <textarea x-model="ocrResult.rawText" rows="9"
-                                    class="w-full p-3 font-mono text-xs text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-brand-500 leading-relaxed select-all"
-                                    readonly>
+                            <div x-show="ocrTab === 'raw'" class="space-y-2.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[11px] text-slate-500" x-text="t('rawTextHint')"></p>
+                                    <button 
+                                        @click="reparseRawText" 
+                                        type="button" 
+                                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200/80 transition flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                        <span x-text="t('reparseBtn')">Ekstraksi Ulang</span>
+                                    </button>
+                                </div>
+                                <textarea 
+                                    x-model="ocrResult.rawText" 
+                                    rows="9"
+                                    class="w-full p-3 font-mono text-xs text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-brand-500 leading-relaxed select-all">
                                 </textarea>
                             </div>
 
@@ -1278,6 +1289,8 @@
                 ocrModalSubtitle: "Periksa dan sesuaikan data sebelum diterapkan",
                 detectedTab: "Hasil Deteksi",
                 rawTextTab: "Teks Mentah",
+                reparseBtn: "Ekstraksi Ulang",
+                rawTextHint: "Bisa edit / tempel teks mentah di bawah lalu klik Ekstraksi Ulang.",
                 changePhoto: "Ganti Foto",
                 detectedMenus: "Menu Terdeteksi",
                 addMenuBtn: "+ Tambah",
@@ -1351,6 +1364,8 @@
                 ocrModalSubtitle: "Review and adjust details before applying",
                 detectedTab: "Detected Data",
                 rawTextTab: "Raw Text",
+                reparseBtn: "Re-extract",
+                rawTextHint: "You can edit or paste raw text below then click Re-extract.",
                 changePhoto: "Change Photo",
                 detectedMenus: "Detected Items",
                 addMenuBtn: "+ Add",
@@ -1941,32 +1956,36 @@
                         const img = new Image();
                         img.onload = () => {
                             const canvas = document.createElement('canvas');
-                            const maxDim = 1800;
                             let width = img.width;
                             let height = img.height;
 
-                            if (width > maxDim || height > maxDim) {
-                                if (width > height) {
-                                    height = Math.round((height * maxDim) / width);
-                                    width = maxDim;
-                                } else {
-                                    width = Math.round((width * maxDim) / height);
-                                    height = maxDim;
-                                }
+                            // Upscale low-res cropped images so characters have enough pixels for Tesseract
+                            const minDimension = Math.min(width, height);
+                            if (minDimension < 700) {
+                                const scale = Math.min(3.5, 950 / minDimension);
+                                width = Math.round(width * scale);
+                                height = Math.round(height * scale);
+                            } else if (width > 2200 || height > 2200) {
+                                const maxDim = 2200;
+                                const scale = maxDim / Math.max(width, height);
+                                width = Math.round(width * scale);
+                                height = Math.round(height * scale);
                             }
 
                             canvas.width = width;
                             canvas.height = height;
                             const ctx = canvas.getContext('2d');
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
                             ctx.drawImage(img, 0, 0, width, height);
 
-                            // Contrast enhancement & grayscale for text legibility
+                            // Gentle contrast & grayscale to preserve fine character strokes without clipping
                             try {
                                 const imgData = ctx.getImageData(0, 0, width, height);
                                 const d = imgData.data;
                                 for (let i = 0; i < d.length; i += 4) {
                                     const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-                                    const contrast = (gray - 128) * 1.35 + 128;
+                                    const contrast = (gray - 128) * 1.15 + 128;
                                     const finalVal = Math.min(255, Math.max(0, contrast));
                                     d[i] = finalVal;
                                     d[i + 1] = finalVal;
@@ -2013,55 +2032,135 @@
                 },
 
                 parseReceiptText(text) {
-                    const rawLines = text.split('\n').map(l => l.trim()).filter(Boolean);
+                    if (!text) return { subtotal: null, total: null, items: [], rawText: '' };
+                    const rawLines = text.split('\n')
+                        .map(l => l.replace(/^[\|\s\-=_*#]+|[\|\s\-=_*#]+$/g, '').trim())
+                        .filter(Boolean);
+
                     const items = [];
                     let detectedSubtotal = null;
                     let detectedTotal = null;
 
-                    const extractNum = (str) => {
-                        const matches = str.match(/(\d{1,3}(?:[\.,]\d{3})+|\d{4,7})/g);
-                        if (!matches) return 0;
-                        const last = matches[matches.length - 1];
-                        const cleaned = last.replace(/[\.,]/g, '');
-                        return parseInt(cleaned, 10);
+                    const extractNumbers = (str) => {
+                        if (!str) return [];
+                        const matches = str.match(/(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{3,7})/gi);
+                        if (!matches) return [];
+                        return matches.map(m => {
+                            const clean = m.replace(/[^0-9]/g, '');
+                            return parseInt(clean, 10);
+                        }).filter(n => !isNaN(n));
+                    };
+
+                    const isDashedOrSeparator = (line) => /^[\-=_*.]{3,}$/.test(line);
+
+                    const isIgnoredRow = (lower) => {
+                        return /^(dine\s*in|take\s*away|takeaway|order|table|meja|kasir|cashier|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
+                               /^(tax|tex|pb1|pb\s*1|pajak|ppn|service|sc\b|biaya|ongkir|voucher|promo|diskon|discount)/i.test(lower) ||
+                               /^(mandiri|bca|bni|bri|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|kembali|kembalian|change)/i.test(lower) ||
+                               /^(terima|thank|matur|kunjungan|wifi|password|lunas|paid|selamat)/i.test(lower) ||
+                               /^(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot)/i.test(lower) ||
+                               /^(grand\s*total|total\b|tolal|tota[l1|])/i.test(lower) ||
+                               /^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(lower) ||
+                               /^\d{1,2}:\d{2}/.test(lower);
+                    };
+
+                    const isQtyPriceLine = (line) => {
+                        const trimmed = line.trim();
+                        return /^(?:[0-9tiI|]+[\s\.\,]*x|x\s*\d+|[0-9tiI|]+\s*@|@\s*\d+|\d+\s*pcs|\d+\s*porsi|\d+\s+\d{1,3}[\.,]\d{3}|\d{1,3}[\.,]\d{3}\s*x)/i.test(trimmed) ||
+                               /^[0-9tiI|\s\.xX@\,]+$/.test(trimmed);
+                    };
+
+                    const cleanItemName = (name) => {
+                        let clean = name
+                            .replace(/^[\d\s\.\-xX•*#\[\]\(\)]+/, '')
+                            .replace(/@[a-zA-Z0-9_\.]+/g, '')
+                            .replace(/^[£$]5\s+/i, 'ES ')
+                            .replace(/^e5\s+/i, 'ES ')
+                            .replace(/[\.\:,\|\-_@\s]+$/, '')
+                            .trim();
+                        if (clean.length < 3 && !['mi', 'es'].includes(clean.toLowerCase())) {
+                            clean = `Menu ${items.length + 1}`;
+                        }
+                        return clean;
                     };
 
                     for (let i = 0; i < rawLines.length; i++) {
                         const line = rawLines[i];
                         const lower = line.toLowerCase();
 
-                        // 1. Detect subtotal
-                        if (lower.includes('subtotal') || lower.includes('total pesanan') || lower.includes('total menu') || lower.includes('harga makanan') || lower.includes('sub total')) {
-                            const val = extractNum(line);
-                            if (val >= 1000 && !detectedSubtotal) detectedSubtotal = val;
+                        if (isDashedOrSeparator(line)) continue;
+
+                        // Detect Subtotal (e.g. Subtotal, Sub Total, sb Total, sbtol, sbtl, subttl)
+                        if (/(?:^|\b)(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot|total\s*pesanan|total\s*menu|harga\s*makanan)(?:\b|$)/i.test(lower)) {
+                            let nums = extractNumbers(line);
+                            if (nums.length === 0 && i + 1 < rawLines.length) {
+                                nums = extractNumbers(rawLines[i + 1]);
+                            }
+                            if (nums.length > 0 && !detectedSubtotal) {
+                                detectedSubtotal = nums[nums.length - 1];
+                            }
                             continue;
                         }
 
-                        // 2. Detect total akhir / grand total
-                        if (lower.includes('total bayar') || lower.includes('total dibayar') || lower.includes('total tagihan') || lower.includes('total pembayaran') || lower.includes('grand total') || lower.includes('total akhir') || (lower.startsWith('total') && !lower.includes('diskon'))) {
-                            const val = extractNum(line);
-                            if (val >= 1000 && !detectedTotal) detectedTotal = val;
-                            continue;
-                        }
-
-                        // 3. Skip discount / tax / fees / payment methods
-                        if (lower.includes('diskon') || lower.includes('promo') || lower.includes('voucher') || lower.includes('ongkir') || lower.includes('ongkos') || lower.includes('biaya') || lower.includes('kembalian') || lower.includes('tunai') || lower.includes('gopay') || lower.includes('ovo') || lower.includes('shopeepay') || lower.includes('qris') || lower.includes('cash') || lower.includes('pajak') || lower.includes('ppn')) {
-                            continue;
-                        }
-
-                        // 4. Try extract menu items: [Item Name] [Price]
-                        const numMatches = line.match(/(.+?)\s+(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{4,6})$/i);
-                        if (numMatches) {
-                            let name = numMatches[1].replace(/^[\d\s\.\-xX•*]+/, '').trim();
-                            const price = parseInt(numMatches[2].replace(/[\.,]/g, ''), 10);
-                            if (name.length >= 3 && price >= 3000 && price <= 1500000) {
-                                name = name.charAt(0).toUpperCase() + name.slice(1);
-                                items.push({
-                                    name,
-                                    price: this.formatNumber(price)
-                                });
+                        // Detect Grand Total / Total
+                        if (/(?:^|\b)(grand\s*total|total\s*bayar|total\s*akhir|total\s*tagihan|total\s*pembayaran|total|tolal|tota[l1|]|tot\b)(?:\b|$)/i.test(lower)) {
+                            if (!lower.includes('item') && !lower.includes('qty') && !lower.includes('porsi') && !lower.includes('diskon')) {
+                                let nums = extractNumbers(line);
+                                if (nums.length === 0 && i + 1 < rawLines.length) {
+                                    nums = extractNumbers(rawLines[i + 1]);
+                                }
+                                if (nums.length > 0 && !detectedTotal) {
+                                    detectedTotal = nums[nums.length - 1];
+                                }
+                                continue;
                             }
                         }
+
+                        if (isIgnoredRow(lower)) continue;
+
+                        // Pattern 1: Same-line item
+                        const sameLineMatch = line.match(/^(.+?)(?:\s+|[\.:\-_=]+)\s*(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{3,7})$/i);
+                        if (sameLineMatch) {
+                            const nameCandidate = cleanItemName(sameLineMatch[1]);
+                            const price = parseInt(sameLineMatch[2].replace(/[\.,]/g, ''), 10);
+                            if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
+                                items.push({
+                                    name: nameCandidate,
+                                    price: this.formatNumber(price)
+                                });
+                                continue;
+                            }
+                        }
+
+                        // Pattern 2: Two-line item (Line i: Name, Line i+1: Qty/Price)
+                        if (i + 1 < rawLines.length) {
+                            const nextLine = rawLines[i + 1];
+                            if (isQtyPriceLine(nextLine)) {
+                                const nums = extractNumbers(nextLine);
+                                if (nums.length > 0) {
+                                    const price = nums[nums.length - 1];
+                                    const nameCandidate = cleanItemName(line);
+
+                                    if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
+                                        items.push({
+                                            name: nameCandidate,
+                                            price: this.formatNumber(price)
+                                        });
+                                        i++;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!detectedSubtotal && items.length > 0) {
+                        const sum = items.reduce((acc, it) => acc + this.parseNum(it.price), 0);
+                        if (sum > 0) detectedSubtotal = sum;
+                    }
+
+                    if (!detectedTotal && detectedSubtotal) {
+                        detectedTotal = detectedSubtotal;
                     }
 
                     return {
@@ -2070,6 +2169,17 @@
                         items,
                         rawText: text
                     };
+                },
+
+                reparseRawText() {
+                    if (!this.ocrResult || !this.ocrResult.rawText) return;
+                    const parsed = this.parseReceiptText(this.ocrResult.rawText);
+                    this.ocrResult.subtotal = parsed.subtotal;
+                    this.ocrResult.total = parsed.total;
+                    this.ocrResult.items = parsed.items;
+                    this.ocrTab = 'result';
+                    this.ocrStatus = `Berhasil mendeteksi ${parsed.items.length} item menu!`;
+                    this.showToast(`Berhasil mendeteksi ${parsed.items.length} item menu`);
                 },
 
                 addOcrItem() {
