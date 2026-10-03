@@ -1,0 +1,26 @@
+{
+  "name": "calculator-discount-gojek",
+  "version": "1.0.0",
+  "description": "[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE) [![Framework: Alpine.js](https://img.shields.io/badge/Alpine.js-3.14-8bc0d0.svg)](https://alpinejs.dev/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38bdf8.svg)](https://tailwindcss.com/) [![OCR: Tesseract.js](https://img.shields.io/badge/OCR-Tesseract.js-5c6ac4.svg)](https://tesseract.projectnaptha.com/)",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i src/input.css -o css/style.min.css --minify",
+    "watch:css": "tailwindcss -i src/input.css -o css/style.min.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muliaabdi/calculator-discount-gojek.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/muliaabdi/calculator-discount-gojek/issues"
+  },
+  "homepage": "https://github.com/muliaabdi/calculator-discount-gojek#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

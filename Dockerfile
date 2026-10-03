@@ -8,6 +8,8 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy web files
 COPY index.html /usr/share/nginx/html/
+COPY css/ /usr/share/nginx/html/css/
+COPY js/ /usr/share/nginx/html/js/
 
 # Expose HTTP port
 EXPOSE 80
