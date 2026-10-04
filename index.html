@@ -71,7 +71,7 @@
         rel="stylesheet">
 
     <!-- Compiled Static Stylesheet (Tailwind v4 Minified) -->
-    <link rel="stylesheet" href="css/style.min.css?v=1.1.6">
+    <link rel="stylesheet" href="css/style.min.css?v=1.1.7">
 
     <!-- Global Cursor Pointer & Interactive Fix -->
     <style>
@@ -582,13 +582,16 @@
 
             <!-- Rekapitulasi & Validasi Selisih -->
             <template x-if="isValidParameters">
-                <section class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+                <section
+                    class="rounded-2xl p-4 sm:p-5 border shadow-sm space-y-3 transition-colors"
+                    :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200/90' : 'bg-amber-50/60 border-amber-300/80'">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500"
+                        <h3 class="text-xs font-bold uppercase tracking-wider transition-colors"
+                            :class="roundingDifference === 0 ? 'text-emerald-800/80' : 'text-amber-800/80'"
                             x-text="t('statusValidation')"></h3>
                         <span
-                            :class="roundingDifference === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
-                            class="text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            :class="roundingDifference === 0 ? 'bg-emerald-100 text-emerald-800 border-emerald-300/60' : 'bg-amber-100 text-amber-900 border-amber-300/60'"
+                            class="text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border">
                             <span class="w-1.5 h-1.5 rounded-full"
                                 :class="roundingDifference === 0 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                             <span
@@ -597,28 +600,30 @@
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="p-3 bg-white/95 rounded-xl border transition-colors shadow-2xs"
+                            :class="roundingDifference === 0 ? 'border-emerald-100' : 'border-amber-100'">
                             <div class="text-[11px] font-semibold text-slate-400" x-text="t('receiptTotal')"></div>
                             <div class="text-base font-bold text-slate-800">Rp <span
                                     x-text="formatNumber(parsedTotalAmount)"></span></div>
                         </div>
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="p-3 bg-white/95 rounded-xl border transition-colors shadow-2xs"
+                            :class="roundingDifference === 0 ? 'border-emerald-100' : 'border-amber-100'">
                             <div class="text-[11px] font-semibold text-slate-400" x-text="t('splitResultTotal')"></div>
                             <div class="text-base font-bold text-slate-800">Rp <span
                                     x-text="formatNumber(totalAllocatedShare)"></span></div>
                         </div>
-                        <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border"
-                            :class="roundingDifference === 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/70 border-amber-200'">
-                            <div class="text-[11px] font-semibold"
-                                :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-700'"
+                        <div class="col-span-2 sm:col-span-1 p-3 rounded-xl border transition-colors shadow-2xs"
+                            :class="roundingDifference === 0 ? 'bg-emerald-100/70 border-emerald-300/80' : 'bg-amber-100/80 border-amber-300'">
+                            <div class="text-[11px] font-bold transition-colors"
+                                :class="roundingDifference === 0 ? 'text-emerald-700' : 'text-amber-800'"
                                 x-text="t('roundingDiff')"></div>
                             <div class="text-base font-extrabold flex items-center justify-between"
-                                :class="roundingDifference === 0 ? 'text-emerald-800' : 'text-amber-900'">
+                                :class="roundingDifference === 0 ? 'text-emerald-900' : 'text-amber-900'">
                                 <span><span x-text="roundingDifference > 0 ? '+' : ''"></span>Rp <span
                                         x-text="formatNumber(roundingDifference)"></span></span>
                                 <template x-if="roundingDifference !== 0">
                                     <button @click="autoFixRounding" type="button"
-                                        class="text-[11px] font-bold bg-amber-200/80 hover:bg-amber-300 text-amber-900 px-2 py-0.5 rounded-md transition"
+                                        class="text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg transition shadow-xs"
                                         title="Otomatis bulatkan selisih ke item terbesar" x-text="t('fixRoundingBtn')">
                                     </button>
                                 </template>
@@ -627,7 +632,7 @@
                     </div>
 
                     <template x-if="roundingDifference !== 0">
-                        <p class="text-xs text-amber-700/90 leading-relaxed flex items-start gap-1.5">
+                        <p class="text-xs text-amber-800 leading-relaxed flex items-start gap-1.5 bg-amber-100/70 p-2.5 rounded-xl border border-amber-200/80">
                             <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
