@@ -131,10 +131,11 @@ function calculator() {
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         },
         get currentAppUrl() {
-            if (typeof window !== 'undefined' && window.location && window.location.href.includes('http')) {
-                return window.location.href.split('?')[0];
+            if (typeof window !== 'undefined' && window.location && window.location.origin) {
+                const path = window.location.pathname.replace(/\/+$/, '');
+                return `${window.location.origin}${path}`;
             }
-            return 'https://calculator.muliaabdi.net/';
+            return 'https://calculator.muliaabdi.net';
         },
         get parsedTotalPrice() {
             return this.parseNum(this.state.total_price);
