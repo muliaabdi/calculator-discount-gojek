@@ -130,7 +130,13 @@ const I18N = {
         sharedBillBadge: "Tagihan Bersama Dibagikan",
         sharedBillHeading: "Pilih Menu yang Kamu Pesan",
         sharedBillDesc: "Centang kotak pada makanan/minuman yang kamu pesan di bawah. Total bayar (termasuk pajak & service / diskon) akan dihitung otomatis!",
-        newBillBtn: "Buat Patungan Baru"
+        newBillBtn: "Buat Patungan Baru",
+        splitRowTooltip: "Bagi menu ini ke beberapa orang",
+        splitRowModalTitle: "Bagi Porsi Menu",
+        splitRowModalDesc: "Bagi rata menu ini untuk dimakan bareng:",
+        splitRowPeopleCount: "Dibagi untuk berapa orang?",
+        splitRowBtn: "Bagi Menu",
+        splitSuccessToast: "Menu berhasil dibagi!"
     },
     en: {
         appSubtitle: "Fair & Proportional Food Bill Splitter",
@@ -259,7 +265,13 @@ const I18N = {
         sharedBillBadge: "Shared Bill",
         sharedBillHeading: "Select Your Dishes",
         sharedBillDesc: "Check the boxes for the items you ordered below. Your personal share with proportional taxes/discounts will calculate automatically!",
-        newBillBtn: "Start New Bill"
+        newBillBtn: "Start New Bill",
+        splitRowTooltip: "Split this dish among multiple people",
+        splitRowModalTitle: "Split Dish Portion",
+        splitRowModalDesc: "Split this item evenly among people:",
+        splitRowPeopleCount: "Split among how many people?",
+        splitRowBtn: "Split Dish",
+        splitSuccessToast: "Menu split successfully!"
     }
 };
 

@@ -430,10 +430,10 @@
 
                                 <!-- Row Actions -->
                                 <div class="flex items-center gap-1 self-end sm:self-center shrink-0">
-                                    <!-- Split button (Bagi 2 porsi) -->
-                                    <button @click="splitPersonRow(idx)" type="button"
+                                    <!-- Split button (Bagi porsi menu) -->
+                                    <button @click="openSplitRowModal(idx)" type="button"
                                         class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 flex items-center justify-center transition active:scale-90"
-                                        :title="t('splitRowTooltip')">
+                                        :title="t('splitRowTooltip', 'Bagi menu ini ke beberapa orang')">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
@@ -1147,6 +1147,99 @@
             </div>
         </div>
 
+        <!-- Modal Bagi Porsi Menu (2, 3, 4, N orang) -->
+        <div x-show="showSplitModal" x-transition.opacity.duration.150ms
+            class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div @click.outside="closeSplitRowModal()"
+                class="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col p-5 sm:p-6 space-y-4">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-sm text-slate-800" x-text="t('splitRowModalTitle', 'Bagi Porsi Menu')">Bagi Porsi Menu</h3>
+                            <p class="text-[11px] text-slate-500" x-text="t('splitRowModalDesc', 'Bagi rata menu ini untuk dimakan bareng:')">Bagi rata menu ini untuk dimakan bareng:</p>
+                        </div>
+                    </div>
+                    <button @click="closeSplitRowModal()" type="button" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Item Target Highlight -->
+                <template x-if="splitModalTargetItem">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-700 truncate mr-2" x-text="splitModalTargetItem.name"></span>
+                        <span class="text-xs font-black text-brand-600 shrink-0">Rp <span x-text="formatNumber(parseNum(splitModalTargetItem.price))"></span></span>
+                    </div>
+                </template>
+
+                <!-- Stepper & Quick Pills -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700" x-text="t('splitRowPeopleCount', 'Dibagi untuk berapa orang?')">Dibagi untuk berapa orang?</label>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <template x-for="cnt in [2, 3, 4, 5]" :key="cnt">
+                            <button type="button" @click="splitModalCount = cnt"
+                                :class="splitModalCount === cnt ? 'bg-brand-500 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                                class="flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition text-center">
+                                <span x-text="cnt"></span> <span class="text-[10px] font-medium" x-text="lang === 'en' ? 'pax' : 'orang'">orang</span>
+                            </button>
+                        </template>
+                    </div>
+
+                    <!-- Stepper fine tuning -->
+                    <div class="flex items-center justify-center gap-3 pt-2">
+                        <button type="button" @click="if (splitModalCount > 2) splitModalCount--"
+                            :disabled="splitModalCount <= 2"
+                            class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-slate-700 font-bold flex items-center justify-center transition">
+                            -
+                        </button>
+                        <div class="text-sm font-black text-slate-800 min-w-[70px] text-center">
+                            <span x-text="splitModalCount"></span> <span class="text-xs font-semibold text-slate-500" x-text="lang === 'en' ? 'people' : 'orang'">orang</span>
+                        </div>
+                        <button type="button" @click="if (splitModalCount < 12) splitModalCount++"
+                            :disabled="splitModalCount >= 12"
+                            class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-slate-700 font-bold flex items-center justify-center transition">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Real-time calculation preview -->
+                <template x-if="splitModalTargetItem">
+                    <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 text-xs text-emerald-800 space-y-1">
+                        <div class="flex items-center justify-between font-semibold">
+                            <span>Masing-masing patungan:</span>
+                            <span class="text-emerald-700 font-black">
+                                ~Rp <span x-text="formatNumber(Math.round(parseNum(splitModalTargetItem.price) / splitModalCount))"></span>
+                            </span>
+                        </div>
+                        <div class="text-[11px] text-emerald-700/80 flex items-center justify-between">
+                            <span>Sisa selisih ganjil dibagikan rata</span>
+                            <span>Pas Rp <span x-text="formatNumber(parseNum(splitModalTargetItem.price))"></span></span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2 pt-1">
+                    <button type="button" @click="closeSplitRowModal()"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                        Batal
+                    </button>
+                    <button type="button" @click="confirmSplitRow()"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 active:scale-95 text-white shadow-md shadow-brand-500/25 transition">
+                        Bagi Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Hasil Pindai Struk OCR -->
         <div x-show="showOcrModal" x-transition.opacity.duration.150ms
             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
@@ -1427,9 +1520,9 @@
     </div>
 
     <!-- Application Logic (Modular Scripts) -->
-    <script src="js/i18n.js?v=1.1.1"></script>
-    <script src="js/ocr.js?v=1.1.1"></script>
-    <script src="js/app.js?v=1.1.1"></script>
+    <script src="js/i18n.js?v=1.1.2"></script>
+    <script src="js/ocr.js?v=1.1.2"></script>
+    <script src="js/app.js?v=1.1.2"></script>
 </body>
 
 </html>

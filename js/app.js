@@ -39,6 +39,9 @@ function calculator() {
         // OCR Scanner State
         showScanPickerModal: false,
         showOcrModal: false,
+        showSplitModal: false,
+        splitModalTargetIndex: null,
+        splitModalCount: 2,
         ocrScanning: false,
         ocrProgress: 0,
         ocrStatus: '',
@@ -231,30 +234,49 @@ function calculator() {
                 this.state.persons.splice(index, 1);
             }
         },
-        splitPersonRow(index) {
+        get splitModalTargetItem() {
+            if (this.splitModalTargetIndex === null || !this.state.persons[this.splitModalTargetIndex]) return null;
+            return this.state.persons[this.splitModalTargetIndex];
+        },
+        openSplitRowModal(index) {
+            this.splitModalTargetIndex = index;
+            this.splitModalCount = 2;
+            this.showSplitModal = true;
+        },
+        closeSplitRowModal() {
+            this.showSplitModal = false;
+            this.splitModalTargetIndex = null;
+        },
+        confirmSplitRow() {
+            if (this.splitModalTargetIndex === null) return;
+            this.splitPersonRow(this.splitModalTargetIndex, this.splitModalCount);
+            this.closeSplitRowModal();
+        },
+        splitPersonRow(index, count = 2) {
             const p = this.state.persons[index];
             if (!p) return;
             const price = this.parseNum(p.price);
-            const half1 = Math.ceil(price / 2);
-            const half2 = Math.floor(price / 2);
-            const baseName = (p.name || '').replace(/\s*\(\d+\)$/, '').trim() || `Menu ${index + 1}`;
+            const n = Math.max(2, parseInt(count, 10) || 2);
+            const baseUnit = Math.floor(price / n);
+            let remainder = price - (baseUnit * n);
+            const baseName = (p.name || '').replace(/\s*\(\d+(?:\/\d+)?\)$/, '').trim() || `Menu ${index + 1}`;
 
-            const p1 = {
-                id: Date.now(),
-                name: `${baseName} (1)`,
-                price: price > 0 ? this.formatNumber(half1) : null,
-                roundingAdjustment: 0
-            };
-            const p2 = {
-                id: Date.now() + 1,
-                name: `${baseName} (2)`,
-                price: price > 0 ? this.formatNumber(half2) : null,
-                roundingAdjustment: 0
-            };
+            const newPersons = [];
+            const baseTime = Date.now();
+            for (let q = 1; q <= n; q++) {
+                const priceForThis = baseUnit + (remainder > 0 ? 1 : 0);
+                if (remainder > 0) remainder--;
+                newPersons.push({
+                    id: baseTime + q,
+                    name: `${baseName} (${q}/${n})`,
+                    price: price > 0 ? this.formatNumber(priceForThis) : null,
+                    roundingAdjustment: 0
+                });
+            }
 
-            this.state.persons.splice(index, 1, p1, p2);
+            this.state.persons.splice(index, 1, ...newPersons);
             this.saveToStorage();
-            this.showToast(this.t('splitSuccessToast') || 'Menu berhasil dipecah!');
+            this.showToast(this.t('splitSuccessToast') || `Menu berhasil dibagi ke ${n} orang!`);
         },
 
         // Input handling
