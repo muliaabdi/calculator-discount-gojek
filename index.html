@@ -132,7 +132,7 @@
                         </button>
                     </div>
 
-                    <button @click="showScanPickerModal = true" type="button"
+                    <button x-show="!isSharedBillView" @click="showScanPickerModal = true" type="button"
                         class="px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-lg transition active:scale-95 flex items-center gap-1.5 shadow-2xs group"
                         :title="t('scanReceipt')">
                         <svg class="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform"
@@ -154,7 +154,7 @@
                     <input type="file" x-ref="galleryInput" accept="image/*" class="hidden"
                         @change="handleReceiptImageUpload($event)">
 
-                    <button @click="resetAll" type="button"
+                    <button x-show="!isSharedBillView" @click="resetAll" type="button"
                         class="px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition active:scale-95 flex items-center gap-1"
                         :title="t('reset')">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -208,9 +208,18 @@
                     <div class="flex items-center gap-2">
                         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700"
                             x-text="t('receiptParams')"></h2>
+                        <template x-if="isSharedBillView">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200 shadow-2xs select-none">
+                                <svg class="w-3 h-3 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                                <span>Terkunci</span>
+                            </span>
+                        </template>
                     </div>
 
-                    <template x-if="sumMenuPrices > 0">
+                    <template x-if="sumMenuPrices > 0 && !isSharedBillView">
                         <div class="flex items-center gap-2">
                             <button @click="applySumAsOriginalPrice" type="button"
                                 class="text-xs text-brand-600 hover:text-brand-700 font-semibold bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-md transition flex items-center gap-1">
@@ -238,9 +247,11 @@
                             <span
                                 class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-slate-400 group-focus-within:text-brand-600 transition">Rp</span>
                             <input id="total_price" type="text" inputmode="numeric" x-model="state.total_price"
+                                :readonly="isSharedBillView" :disabled="isSharedBillView"
+                                :class="isSharedBillView ? 'bg-slate-100 text-slate-500 cursor-not-allowed select-none opacity-80' : 'bg-slate-50 text-slate-800 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10'"
                                 placeholder="Contoh: 120.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_price')"
-                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm">
+                                class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl font-bold placeholder:text-slate-300 placeholder:font-normal outline-none transition shadow-sm">
                         </div>
                     </div>
 
@@ -257,15 +268,17 @@
                             <span
                                 class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-emerald-600">Rp</span>
                             <input id="total_ammount" type="text" inputmode="numeric" x-model="state.total_ammount"
+                                :readonly="isSharedBillView" :disabled="isSharedBillView"
+                                :class="isSharedBillView ? 'bg-emerald-100/50 text-emerald-800 cursor-not-allowed select-none opacity-80' : 'bg-emerald-50/60 text-emerald-900 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10'"
                                 placeholder="Contoh: 75.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_ammount')"
-                                class="w-full pl-11 pr-4 py-3 bg-emerald-50/60 border border-emerald-300 rounded-xl font-bold text-emerald-900 placeholder:text-emerald-300 placeholder:font-normal focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition shadow-sm">
+                                class="w-full pl-11 pr-4 py-3 border border-emerald-300 rounded-xl font-bold placeholder:text-emerald-300 placeholder:font-normal outline-none transition shadow-sm">
                         </div>
                     </div>
                 </div>
 
                 <!-- Smart Helper: Jika Total 1 & Total 2 sama-sama diisi Grand Total, tapi ada subtotal menu yang lebih kecil -->
-                <template x-if="isValidParameters && parsedTotalPrice === parsedTotalAmount && sumMenuPrices > 0 && sumMenuPrices < parsedTotalPrice">
+                <template x-if="!isSharedBillView && isValidParameters && parsedTotalPrice === parsedTotalAmount && sumMenuPrices > 0 && sumMenuPrices < parsedTotalPrice">
                     <div class="mt-3.5 p-3 rounded-xl bg-amber-50 border border-amber-300/80 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div class="flex items-start gap-2">
                             <span class="text-base leading-none">💡</span>
@@ -384,21 +397,36 @@
                                         class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center shrink-0">
                                         <span x-text="idx + 1"></span>
                                     </div>
-                                    <input type="text" x-model="person.name"
-                                        :placeholder="t('itemPlaceholder') + ' ' + (idx + 1)"
-                                        class="w-full px-3 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-300 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-slate-300 rounded-lg outline-none transition">
+                                    <template x-if="!isSharedBillView">
+                                        <input type="text" x-model="person.name"
+                                            :placeholder="t('itemPlaceholder') + ' ' + (idx + 1)"
+                                            class="w-full px-3 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-300 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-slate-300 rounded-lg outline-none transition">
+                                    </template>
+                                    <template x-if="isSharedBillView">
+                                        <div class="w-full px-3 py-2 text-sm font-bold text-slate-800 truncate select-text"
+                                            x-text="person.name || (t('itemPlaceholder') + ' ' + (idx + 1))">
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <!-- Input Harga Menu -->
                                 <div class="w-full sm:w-44 shrink-0">
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
-                                        <input type="text" inputmode="numeric" x-model="person.price"
-                                            :placeholder="t('pricePlaceholder')" @keypress="numberOnly($event)"
-                                            @input="onFormatInput($event, person, 'price')"
-                                            class="w-full pl-9 pr-3 py-2 text-sm font-bold text-slate-800 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 rounded-xl outline-none transition">
-                                    </div>
+                                    <template x-if="!isSharedBillView">
+                                        <div class="relative">
+                                            <span
+                                                class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                            <input type="text" inputmode="numeric" x-model="person.price"
+                                                :placeholder="t('pricePlaceholder')" @keypress="numberOnly($event)"
+                                                @input="onFormatInput($event, person, 'price')"
+                                                class="w-full pl-9 pr-3 py-2 text-sm font-bold text-slate-800 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 rounded-xl outline-none transition">
+                                        </div>
+                                    </template>
+                                    <template x-if="isSharedBillView">
+                                        <div class="w-full px-3.5 py-2 text-sm font-extrabold text-slate-800 bg-slate-100/80 border border-slate-200/90 rounded-xl flex items-center justify-between select-none">
+                                            <span class="text-xs font-bold text-slate-400">Rp</span>
+                                            <span class="font-extrabold text-slate-900" x-text="person.price ? formatNumber(person.price) : '0'"></span>
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <!-- Panah indikator (Desktop only) -->
@@ -448,7 +476,7 @@
                                 </div>
 
                                 <!-- Row Actions -->
-                                <div class="flex items-center gap-1 self-end sm:self-center shrink-0">
+                                <div x-show="!isSharedBillView" class="flex items-center gap-1 self-end sm:self-center shrink-0">
                                     <!-- Split button (Bagi porsi menu) -->
                                     <button @click="openSplitRowModal(idx)" type="button"
                                         class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 flex items-center justify-center transition active:scale-90"
@@ -533,7 +561,7 @@
                 </div>
 
                 <!-- Tombol Tambah Menu -->
-                <button @click="addRow" type="button"
+                <button x-show="!isSharedBillView" @click="addRow" type="button"
                     class="w-full py-3.5 bg-white hover:bg-slate-50 border-2 border-dashed border-slate-300 hover:border-brand-500 rounded-2xl text-slate-600 hover:text-brand-600 font-bold text-sm transition flex items-center justify-center gap-2 group shadow-sm active:scale-[0.99]">
                     <div
                         class="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-brand-100 text-slate-500 group-hover:text-brand-600 flex items-center justify-center transition">
@@ -1539,9 +1567,9 @@
     </div>
 
     <!-- Application Logic (Modular Scripts) -->
-    <script src="js/i18n.js?v=1.1.2"></script>
-    <script src="js/ocr.js?v=1.1.2"></script>
-    <script src="js/app.js?v=1.1.2"></script>
+    <script src="js/i18n.js?v=1.1.3"></script>
+    <script src="js/ocr.js?v=1.1.3"></script>
+    <script src="js/app.js?v=1.1.3"></script>
 </body>
 
 </html>

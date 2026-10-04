@@ -35,6 +35,7 @@ function calculator() {
         lastRecordedHash: '',
         selectedPersonIds: [],
         isSharedBillView: false,
+        lockedBillPayload: null,
 
         // OCR Scanner State
         showScanPickerModal: false,
@@ -69,6 +70,32 @@ function calculator() {
             this.loadStats();
             this.setupGlobalPasteListener();
             this.$watch('state', () => {
+                if (this.isSharedBillView && this.lockedBillPayload) {
+                    let reverted = false;
+                    if (this.state.total_price !== this.lockedBillPayload.tp) {
+                        this.state.total_price = this.lockedBillPayload.tp;
+                        reverted = true;
+                    }
+                    if (this.state.total_ammount !== this.lockedBillPayload.ta) {
+                        this.state.total_ammount = this.lockedBillPayload.ta;
+                        reverted = true;
+                    }
+                    if (this.lockedBillPayload.m && Array.isArray(this.state.persons)) {
+                        this.lockedBillPayload.m.forEach((locked, i) => {
+                            if (this.state.persons[i]) {
+                                if (this.state.persons[i].price !== locked.p) {
+                                    this.state.persons[i].price = locked.p;
+                                    reverted = true;
+                                }
+                                if (this.state.persons[i].name !== locked.n) {
+                                    this.state.persons[i].name = locked.n;
+                                    reverted = true;
+                                }
+                            }
+                        });
+                    }
+                    if (reverted) return;
+                }
                 this.saveToStorage();
             });
         },
@@ -221,6 +248,7 @@ function calculator() {
 
         // Row operations
         addRow() {
+            if (this.isSharedBillView) return;
             const nextId = this.state.persons.length > 0 ? Math.max(...this.state.persons.map(p => p.id)) + 1 : 1;
             this.state.persons.push({
                 id: nextId,
@@ -230,6 +258,7 @@ function calculator() {
             });
         },
         removeRow(index) {
+            if (this.isSharedBillView) return;
             if (this.state.persons.length > 1) {
                 this.state.persons.splice(index, 1);
             }
@@ -239,6 +268,7 @@ function calculator() {
             return this.state.persons[this.splitModalTargetIndex];
         },
         openSplitRowModal(index) {
+            if (this.isSharedBillView) return;
             this.splitModalTargetIndex = index;
             this.splitModalCount = 2;
             this.showSplitModal = true;
@@ -248,11 +278,12 @@ function calculator() {
             this.splitModalTargetIndex = null;
         },
         confirmSplitRow() {
-            if (this.splitModalTargetIndex === null) return;
+            if (this.isSharedBillView || this.splitModalTargetIndex === null) return;
             this.splitPersonRow(this.splitModalTargetIndex, this.splitModalCount);
             this.closeSplitRowModal();
         },
         splitPersonRow(index, count = 2) {
+            if (this.isSharedBillView) return;
             const p = this.state.persons[index];
             if (!p) return;
             const price = this.parseNum(p.price);
@@ -556,6 +587,12 @@ function calculator() {
             const data = this.decodeBillPayload(rawParam);
             if (data && (data.tp || data.ta || (Array.isArray(data.m) && data.m.length > 0))) {
                 this.isSharedBillView = true;
+                this.lockedBillPayload = {
+                    tp: data.tp || '',
+                    ta: data.ta || '',
+                    pi: data.pi || '',
+                    m: (data.m || []).map(it => ({ n: it.n || '', p: it.p || '' }))
+                };
                 if (data.tp) this.state.total_price = data.tp;
                 if (data.ta) this.state.total_ammount = data.ta;
                 if (data.pi) this.state.payment_info = data.pi;
@@ -600,6 +637,7 @@ function calculator() {
                 history.replaceState(null, '', window.location.pathname);
             }
             this.isSharedBillView = false;
+            this.lockedBillPayload = null;
             this.selectedPersonIds = [];
             this.resetCalculation();
         },
