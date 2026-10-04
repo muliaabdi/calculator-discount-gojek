@@ -27,11 +27,14 @@ function calculator() {
             count: 1
         },
         showShareModal: false,
-        shareTab: 'text',
+        shareTab: 'link',
         copied: false,
+        linkCopied: false,
         copyingImage: false,
         toastMessage: '',
         lastRecordedHash: '',
+        selectedPersonIds: [],
+        isSharedBillView: false,
 
         // OCR Scanner State
         showScanPickerModal: false,
@@ -41,9 +44,14 @@ function calculator() {
         ocrStatus: '',
         ocrPreviewUrl: '',
         ocrTab: 'result', // 'result' | 'raw'
+        ocrAutoSplitQty: true,
         ocrResult: {
             subtotal: null,
             total: null,
+            surcharges: [],
+            totalSurcharges: 0,
+            discounts: [],
+            totalDiscounts: 0,
             items: [],
             rawText: ''
         },
@@ -54,6 +62,7 @@ function calculator() {
                 this.lang = savedLang;
             }
             this.loadFromStorage();
+            this.checkSharedLink();
             this.loadStats();
             this.setupGlobalPasteListener();
             this.$watch('state', () => {
@@ -112,6 +121,21 @@ function calculator() {
             const pct = ((this.parsedTotalPrice - this.parsedTotalAmount) / this.parsedTotalPrice) * 100;
             return Math.round(pct);
         },
+        get isSurchargeMode() {
+            return this.isValidParameters && this.parsedTotalAmount > this.parsedTotalPrice;
+        },
+        get isDiscountMode() {
+            return this.isValidParameters && this.parsedTotalAmount < this.parsedTotalPrice;
+        },
+        get totalSurchargeAmount() {
+            if (!this.isValidParameters) return 0;
+            return Math.max(0, this.parsedTotalAmount - this.parsedTotalPrice);
+        },
+        get surchargePercentage() {
+            if (!this.isValidParameters || this.parsedTotalPrice === 0) return 0;
+            const pct = ((this.parsedTotalAmount - this.parsedTotalPrice) / this.parsedTotalPrice) * 100;
+            return Math.round(pct * 10) / 10;
+        },
         get payRatioPercent() {
             if (!this.isValidParameters || this.parsedTotalPrice === 0) return 100;
             const ratio = (this.parsedTotalAmount / this.parsedTotalPrice) * 100;
@@ -126,6 +150,36 @@ function calculator() {
         },
         get activePersons() {
             return this.state.persons.filter(p => this.parseNum(p.price) > 0);
+        },
+
+        // Selection & My Bill helpers
+        togglePersonSelection(id) {
+            if (this.selectedPersonIds.includes(id)) {
+                this.selectedPersonIds = this.selectedPersonIds.filter(x => x !== id);
+            } else {
+                this.selectedPersonIds.push(id);
+            }
+        },
+        selectAllPersons() {
+            this.selectedPersonIds = this.state.persons.map(p => p.id);
+        },
+        clearPersonSelection() {
+            this.selectedPersonIds = [];
+        },
+        get selectedPersons() {
+            return this.state.persons.filter(p => this.selectedPersonIds.includes(p.id) && this.parseNum(p.price) > 0);
+        },
+        get selectedTotalMenuPrice() {
+            return this.selectedPersons.reduce((sum, p) => sum + this.parseNum(p.price), 0);
+        },
+        get selectedTotalShare() {
+            return this.selectedPersons.reduce((sum, p) => sum + this.calculatePersonShare(p), 0);
+        },
+        get selectedTotalExtra() {
+            return Math.max(0, this.selectedTotalShare - this.selectedTotalMenuPrice);
+        },
+        get selectedTotalSaving() {
+            return Math.max(0, this.selectedTotalMenuPrice - this.selectedTotalShare);
         },
 
         // Number helpers
@@ -153,6 +207,12 @@ function calculator() {
             const share = this.calculatePersonShare(person);
             return Math.max(0, price - share);
         },
+        calculatePersonExtra(person) {
+            const price = this.parseNum(person.price);
+            if (!price || !this.isValidParameters) return 0;
+            const share = this.calculatePersonShare(person);
+            return Math.max(0, share - price);
+        },
 
         // Row operations
         addRow() {
@@ -168,6 +228,31 @@ function calculator() {
             if (this.state.persons.length > 1) {
                 this.state.persons.splice(index, 1);
             }
+        },
+        splitPersonRow(index) {
+            const p = this.state.persons[index];
+            if (!p) return;
+            const price = this.parseNum(p.price);
+            const half1 = Math.ceil(price / 2);
+            const half2 = Math.floor(price / 2);
+            const baseName = (p.name || '').replace(/\s*\(\d+\)$/, '').trim() || `Menu ${index + 1}`;
+
+            const p1 = {
+                id: Date.now(),
+                name: `${baseName} (1)`,
+                price: price > 0 ? this.formatNumber(half1) : null,
+                roundingAdjustment: 0
+            };
+            const p2 = {
+                id: Date.now() + 1,
+                name: `${baseName} (2)`,
+                price: price > 0 ? this.formatNumber(half2) : null,
+                roundingAdjustment: 0
+            };
+
+            this.state.persons.splice(index, 1, p1, p2);
+            this.saveToStorage();
+            this.showToast(this.t('splitSuccessToast') || 'Menu berhasil dipecah!');
         },
 
         // Input handling
@@ -330,7 +415,11 @@ function calculator() {
                 lines.push(isEn ? '*Bill Summary:*' : '*Ringkasan Tagihan:*');
                 lines.push(`• ${isEn ? 'Original Menu' : 'Total Menu Asli'} : Rp ${this.formatNumber(this.parsedTotalPrice)}`);
                 lines.push(`• ${isEn ? 'Amount Paid' : 'Total Dibayar'}   : *Rp ${this.formatNumber(this.parsedTotalAmount)}*`);
-                lines.push(`• ${isEn ? 'Discount Savings' : 'Hemat Diskon'}    : *Rp ${this.formatNumber(this.totalDiscountAmount)} (${this.discountPercentage}% OFF)*`);
+                if (this.isSurchargeMode) {
+                    lines.push(`• ${isEn ? 'Tax & Service' : 'Pajak & Service'}  : *+Rp ${this.formatNumber(this.totalSurchargeAmount)} (+${this.surchargePercentage}%)*`);
+                } else if (this.totalDiscountAmount > 0) {
+                    lines.push(`• ${isEn ? 'Discount Savings' : 'Hemat Diskon'}    : *Rp ${this.formatNumber(this.totalDiscountAmount)} (${this.discountPercentage}% OFF)*`);
+                }
                 lines.push('─────────────────────────────');
             }
 
@@ -352,7 +441,13 @@ function calculator() {
 
                     lines.push(`\n${count}. *${name}*`);
                     lines.push(`   ├ ${labelMenu}: Rp ${this.formatNumber(price)}`);
-                    if (saving > 0) {
+                    if (this.isSurchargeMode) {
+                        const extra = Math.max(0, share - price);
+                        if (extra > 0) {
+                            const labelExtra = isEn ? 'Tax/Service ' : 'Pajak/Serv ';
+                            lines.push(`   ├ ${labelExtra}: +Rp ${this.formatNumber(extra)}`);
+                        }
+                    } else if (saving > 0) {
                         lines.push(`   ├ ${labelDisc}: Rp ${this.formatNumber(saving)}`);
                     }
                     lines.push(`   └ *${labelPay}: Rp ${this.formatNumber(share)}*`);
@@ -369,16 +464,174 @@ function calculator() {
             }
 
             lines.push('\n─────────────────────────────');
+            lines.push(isEn ? '👉 *Pick your dishes & calculate personal share here:*' : '👉 *Pilih menu & hitung bagianmu di sini:*');
+            lines.push(this.shareableBillLink);
+            lines.push('\n─────────────────────────────');
             lines.push((isEn ? '_Calculated with:_ ' : '_Dihitung via:_ ') + url);
 
             return lines.join('\n');
+        },
+
+        // Bill link encoding and sharing
+        encodeBillPayload(obj) {
+            try {
+                const str = JSON.stringify(obj);
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                    return String.fromCharCode('0x' + p1);
+                })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            } catch (e) {
+                return '';
+            }
+        },
+        decodeBillPayload(encoded) {
+            try {
+                let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+                while (b64.length % 4) b64 += '=';
+                const str = decodeURIComponent(Array.prototype.map.call(atob(b64), (c) => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(str);
+            } catch (e) {
+                return null;
+            }
+        },
+        get shareableBillLink() {
+            const hasData = (this.state.total_price || this.state.total_ammount) || 
+                            this.state.persons.some(p => this.parseNum(p.price) > 0);
+            if (!hasData) {
+                return this.currentAppUrl;
+            }
+            const payload = {
+                tp: this.state.total_price || '',
+                ta: this.state.total_ammount || '',
+                pi: this.state.payment_info || '',
+                m: this.state.persons
+                    .filter(p => this.parseNum(p.price) > 0 || (p.name && p.name.trim()))
+                    .map(p => ({
+                        n: p.name || '',
+                        p: p.price || ''
+                    }))
+            };
+            const encoded = this.encodeBillPayload(payload);
+            const base = (typeof window !== 'undefined' && window.location) 
+                ? (window.location.origin + window.location.pathname) 
+                : this.currentAppUrl;
+            return `${base}#bill=${encoded}`;
+        },
+        checkSharedLink() {
+            if (typeof window === 'undefined' || !window.location) return;
+            let rawParam = '';
+            if (window.location.hash && window.location.hash.includes('bill=')) {
+                rawParam = window.location.hash.split('bill=')[1]?.split('&')[0];
+            } else if (window.location.search && window.location.search.includes('bill=')) {
+                const sp = new URLSearchParams(window.location.search);
+                rawParam = sp.get('bill');
+            }
+            if (!rawParam) return;
+
+            const data = this.decodeBillPayload(rawParam);
+            if (data && (data.tp || data.ta || (Array.isArray(data.m) && data.m.length > 0))) {
+                this.isSharedBillView = true;
+                if (data.tp) this.state.total_price = data.tp;
+                if (data.ta) this.state.total_ammount = data.ta;
+                if (data.pi) this.state.payment_info = data.pi;
+                if (Array.isArray(data.m) && data.m.length > 0) {
+                    this.state.persons = data.m.map((it, idx) => ({
+                        id: idx + 1,
+                        name: it.n || (this.lang === 'en' ? `Item ${idx + 1}` : `Menu ${idx + 1}`),
+                        price: it.p || null,
+                        roundingAdjustment: 0
+                    }));
+                }
+                this.selectedPersonIds = [];
+                this.showToast(this.t('sharedBillLoadedToast') || 'Tagihan bersama berhasil dimuat! Silakan centang menumu.');
+            }
+        },
+        async copyShareLink() {
+            this.recordCalculation();
+            try {
+                await navigator.clipboard.writeText(this.shareableBillLink);
+                this.linkCopied = true;
+                this.showToast(this.t('linkCopiedSuccess') || 'Tautan berhasil disalin!');
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
+                }
+                setTimeout(() => {
+                    this.linkCopied = false;
+                }, 2500);
+            } catch (e) {
+                this.showToast(this.shareableBillLink);
+            }
+        },
+        openWhatsAppWithLink() {
+            this.recordCalculation();
+            const isEn = this.lang === 'en';
+            const msg = isEn 
+                ? `Hi! Here is our food bill split link. Tap the link to check your dishes & calculate your exact share:\n${this.shareableBillLink}`
+                : `Halo! Ini link rincian patungan makan kita. Yuk klik link ini untuk centang menu kamu & hitung jumlah transfernya:\n${this.shareableBillLink}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        },
+        resetToNewBill() {
+            if (typeof window !== 'undefined' && window.history && window.location) {
+                history.replaceState(null, '', window.location.pathname);
+            }
+            this.isSharedBillView = false;
+            this.selectedPersonIds = [];
+            this.resetCalculation();
+        },
+
+        // My Bill message generator & copier
+        generateMyBillMessage() {
+            const isEn = this.lang === 'en';
+            const lines = [];
+            const url = this.currentAppUrl;
+
+            lines.push(isEn ? '*MY FOOD BILL SHARE*' : '*RINCIAN TAGIHAN SAYA*');
+            lines.push('─────────────────────────────');
+            this.selectedPersons.forEach((p, i) => {
+                const price = this.parseNum(p.price);
+                const share = this.calculatePersonShare(p);
+                lines.push(`${i + 1}. *${p.name || ((isEn ? 'Item ' : 'Menu ') + (i + 1))}*`);
+                lines.push(`   ├ ${isEn ? 'Price' : 'Harga'}: Rp ${this.formatNumber(price)}`);
+                lines.push(`   └ *${isEn ? 'Pay' : 'Bayar'}: Rp ${this.formatNumber(share)}*`);
+            });
+            lines.push('─────────────────────────────');
+            lines.push(`• ${isEn ? 'My Menu Total' : 'Total Menu Saya'} : Rp ${this.formatNumber(this.selectedTotalMenuPrice)}`);
+            if (this.isSurchargeMode) {
+                lines.push(`• ${isEn ? 'Tax & Service' : 'Pajak & Service'}  : *+Rp ${this.formatNumber(this.selectedTotalExtra)} (+${this.surchargePercentage}%)*`);
+            } else if (this.isDiscountMode) {
+                lines.push(`• ${isEn ? 'Discount' : 'Hemat Diskon'}     : *Rp ${this.formatNumber(this.selectedTotalSaving)} (${this.discountPercentage}% OFF)*`);
+            }
+            lines.push(`• *${isEn ? 'NET PAYABLE' : 'TOTAL SAYA BAYAR'} : Rp ${this.formatNumber(this.selectedTotalShare)}*`);
+
+            if (this.state.payment_info && this.state.payment_info.trim()) {
+                lines.push('─────────────────────────────');
+                lines.push(isEn ? '*Transfer to:*' : '*Transfer ke:*');
+                lines.push(this.state.payment_info.trim());
+            }
+
+            lines.push('─────────────────────────────');
+            lines.push((isEn ? '_Calculated with:_ ' : '_Dihitung via:_ ') + url);
+
+            return lines.join('\n');
+        },
+        async copyMyBill() {
+            const text = this.generateMyBillMessage();
+            try {
+                await navigator.clipboard.writeText(text);
+                this.showToast(this.t('myBillCopiedToast') || 'Rincian tagihan kamu berhasil disalin!');
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 35, spread: 60, origin: { y: 0.8 } });
+                }
+            } catch (e) {
+                this.showToast('Gagal menyalin teks');
+            }
         },
 
         // Share modal actions
         openShareModal() {
             this.recordCalculation();
             this.showShareModal = true;
-            this.shareTab = 'text';
             this.copied = false;
         },
         async copyToClipboard() {
@@ -729,6 +982,10 @@ function calculator() {
             const parsed = OCR.parseReceiptText(this.ocrResult.rawText, this.formatNumber.bind(this));
             this.ocrResult.subtotal = parsed.subtotal;
             this.ocrResult.total = parsed.total;
+            this.ocrResult.surcharges = parsed.surcharges || [];
+            this.ocrResult.totalSurcharges = parsed.totalSurcharges || 0;
+            this.ocrResult.discounts = parsed.discounts || [];
+            this.ocrResult.totalDiscounts = parsed.totalDiscounts || 0;
             this.ocrResult.items = parsed.items;
             this.ocrTab = 'result';
             this.ocrStatus = `${this.t('ocrSuccess')} ${parsed.items.length} ${this.t('ocrItemsCount')}`;
@@ -738,11 +995,36 @@ function calculator() {
         addOcrItem() {
             this.ocrResult.items.push({
                 name: `Menu ${this.ocrResult.items.length + 1}`,
-                price: '0'
+                price: '0',
+                qty: 1
             });
         },
         removeOcrItem(idx) {
             this.ocrResult.items.splice(idx, 1);
+        },
+        splitOcrItem(idx) {
+            const item = this.ocrResult.items[idx];
+            if (!item) return;
+            const qty = Math.max(1, parseInt(item.qty, 10) || 1);
+            if (qty <= 1) return;
+
+            const totalPrice = this.parseNum(item.price);
+            const baseUnit = Math.floor(totalPrice / qty);
+            let remainder = totalPrice - (baseUnit * qty);
+
+            const newItems = [];
+            for (let q = 1; q <= qty; q++) {
+                const priceForThis = baseUnit + (remainder > 0 ? 1 : 0);
+                if (remainder > 0) remainder--;
+                newItems.push({
+                    name: `${item.name} (${q})`,
+                    price: this.formatNumber(priceForThis),
+                    qty: 1
+                });
+            }
+
+            this.ocrResult.items.splice(idx, 1, ...newItems);
+            this.showToast(this.t('splitSuccessToast') || 'Menu berhasil dipecah!');
         },
 
         applyOcrToCalculator() {
@@ -759,7 +1041,32 @@ function calculator() {
 
             if (this.ocrResult.items.length > 0) {
                 const baseTime = Date.now();
-                this.state.persons = this.ocrResult.items.map((it, idx) => ({
+                const expanded = [];
+
+                this.ocrResult.items.forEach((it) => {
+                    const qty = Math.max(1, parseInt(it.qty, 10) || 1);
+                    const totalPrice = this.parseNum(it.price);
+
+                    if (this.ocrAutoSplitQty && qty > 1 && totalPrice > 0) {
+                        const baseUnit = Math.floor(totalPrice / qty);
+                        let remainder = totalPrice - (baseUnit * qty);
+                        for (let q = 1; q <= qty; q++) {
+                            const priceForThis = baseUnit + (remainder > 0 ? 1 : 0);
+                            if (remainder > 0) remainder--;
+                            expanded.push({
+                                name: `${it.name || 'Menu'} (${q})`,
+                                price: this.formatNumber(priceForThis)
+                            });
+                        }
+                    } else {
+                        expanded.push({
+                            name: (it.qty > 1 && !this.ocrAutoSplitQty) ? `${it.name || 'Menu'} (${it.qty}x)` : (it.name || ''),
+                            price: it.price
+                        });
+                    }
+                });
+
+                this.state.persons = expanded.map((it, idx) => ({
                     id: baseTime + idx,
                     name: it.name || `Orang ${idx + 1}`,
                     price: it.price,

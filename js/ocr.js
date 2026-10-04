@@ -71,10 +71,30 @@ const OCR = {
         const items = [];
         let detectedSubtotal = null;
         let detectedTotal = null;
+        const detectedSurcharges = [];
+        const detectedDiscounts = [];
 
         const extractNumbers = (str) => {
             if (!str) return [];
-            const matches = str.match(/(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{3,8})/gi);
+            // 1. Strip percentage parentheticals so 'Service (5%) 17.250' doesn't grab 5
+            let s = str.replace(/\(?\d+(?:[\.,]\d+)?\s*%\)?/g, ' ');
+
+            // 2. Normalize letter O/o in number sequences like 5OO -> 500, 398.5oo -> 398.500
+            s = s.replace(/(\d)[oO]+/g, (m, d) => d + '0'.repeat(m.length - 1))
+                 .replace(/[oO]+(\d)/g, (m, d) => '0'.repeat(m.length - 1) + d);
+
+            // 3. Spaced dots/commas e.g. "398 . 500" or "398. 500" -> "398.500"
+            s = s.replace(/(\d+)\s*[\.,]\s*(\d{3})\b/g, '$1.$2');
+
+            // 4. Space as thousand separator e.g. "398 500" -> "398.500"
+            s = s.replace(/\b(\d{1,3})\s+(\d{3})\b/g, '$1.$2');
+
+            // 5. Truncated thousands in Rp or total context: "Rp 398.50" or "Rp 398.5" -> "Rp 398.500"
+            s = s.replace(/(?:rp\.?\s*)(\d{2,3})[\.,](\d{1,2})\b/gi, (m, p1, p2) => {
+                return 'Rp ' + p1 + '.' + p2.padEnd(3, '0');
+            });
+
+            const matches = s.match(/(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{1,8})/gi);
             if (!matches) return [];
             return matches.map(m => {
                 const clean = m.replace(/[^0-9]/g, '');
@@ -91,8 +111,8 @@ const OCR = {
 
         const isIgnoredRow = (lower) => {
             return /^[+\-]/.test(lower) || // modifier / discount lines like + Level 1 or -Rp12.000
-                   /^(dine\s*in|take\s*away|takeaway|order|table|meja|kasir|cashier|server|pax|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
-                   /^(tax|tex|pb1|pb\s*1|pajak|ppn|service|sc\b|biaya|ongkir|voucher|promo|diskon|discount)/i.test(lower) ||
+                   /^(dine\s*in|take\s*away|takeaway|order|table|meja|kasir|cashier|server|waiter|waiters|pax|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
+                   /^(tax|tex|pb1|pb\s*1|pajak|ppn|service|sc\b|biaya|ongkir|voucher|promo|diskon|discount|rounding)/i.test(lower) ||
                    /(?:^|\b)(bayar\s*pakai|dibayar|metode\s*pembayaran|payment|paid|mandiri|bca|bni|bri|cimb|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|shopee\s*pay|kembali|kembalian|change)(?:\b|$)/i.test(lower) ||
                    /^(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot|total\s*harga)/i.test(lower) ||
                    /^(grand\s*total|total\b|tolal|tota[l1|])/i.test(lower) ||
@@ -107,7 +127,7 @@ const OCR = {
                    /^[0-9tiI|\s\.xX@\,]+$/.test(trimmed);
         };
 
-        const cleanItemName = (name) => {
+        const cleanItemName = (name, fallbackIdx) => {
             let clean = name
                 .replace(/^[\d\s\.\-xX•*#\[\]\(\)]+/, '')
                 .replace(/@[a-zA-Z0-9_\.]+/g, '')
@@ -115,10 +135,44 @@ const OCR = {
                 .replace(/^e5\s+/i, 'ES ')
                 .replace(/[\.\:,\|\-_@\s]+$/, '')
                 .trim();
-            if (clean.length < 3 && !['mi', 'es'].includes(clean.toLowerCase())) {
-                clean = `Menu ${items.length + 1}`;
+            if (clean.length < 2 && !['mi', 'es'].includes(clean.toLowerCase())) {
+                clean = `Menu ${fallbackIdx || (items.length + 1)}`;
             }
             return clean;
+        };
+
+        const extractQtyAndCleanName = (rawText, defaultIdx) => {
+            let text = rawText.trim();
+            let qty = 1;
+
+            // 1. Trailing Qty pattern: e.g. "N. Ayam Bakar x2", "N. Ayam Bakar x 2", "2x", "2 pcs", "2 porsi", "qty 2", "qty: 2"
+            const trailingMatch = text.match(/(?:\s+|[\-=_])(?:x\s*(\d{1,2})|(\d{1,2})\s*x|qty\s*[:\.]?\s*(\d{1,2})|(\d{1,2})\s*(?:pcs|pc|porsi|cup|btl|ptg|bh|paket))\s*$/i);
+            if (trailingMatch) {
+                qty = parseInt(trailingMatch[1] || trailingMatch[2] || trailingMatch[3] || trailingMatch[4], 10) || 1;
+                text = text.slice(0, trailingMatch.index).trim();
+            } else {
+                // 2. Leading Qty pattern: e.g. "2x Ayam Bakar", "2 x Ayam Bakar", "2pcs Ayam Bakar"
+                const leadingMatch = text.match(/^(\d{1,2})\s*(?:x|pcs|pc|porsi|cup|btl|ptg|bh|paket)\s+/i);
+                if (leadingMatch) {
+                    qty = parseInt(leadingMatch[1], 10) || 1;
+                    text = text.slice(leadingMatch[0].length).trim();
+                }
+            }
+
+            // 3. Inline @ pricing: e.g. "2 @ 47.000" or "@ 47.000"
+            const atMatch = text.match(/(?:^|\s+)(?:(\d{1,2})\s*)?@\s*(?:rp\.?\s*)?[\d\.,]+/i);
+            if (atMatch) {
+                if (atMatch[1]) {
+                    qty = parseInt(atMatch[1], 10) || qty;
+                }
+                text = text.replace(atMatch[0], '').trim();
+            }
+
+            const cleaned = cleanItemName(text, defaultIdx);
+            return {
+                qty: Math.max(1, qty),
+                name: cleaned
+            };
         };
 
         const formatNumber = formatNumberFn || ((num) => new Intl.NumberFormat('id-ID').format(num));
@@ -142,14 +196,44 @@ const OCR = {
                 continue;
             }
 
-            // Detect Grand Total / Total / Total Pembayaran / Total Dibayar
-            if (/(?:^|\b)(grand\s*total|total\s*bayar|total\s*dibayar|total\s*akhir|total\s*tagihan|total\s*pembayaran|total|tolal|tota[l1|]|tot\b)(?:\b|$)/i.test(lower)) {
+            // Detect Surcharges (Tax, Service, PB1, PPN, Rounding, Delivery, Ongkir, Fees)
+            if (/(?:^|\b)(service|sc\b|svc\b|tax|pb\s*1|pb1|ppn|pajak|restaurant\s*tax|rounding|pembulatan|ongkir|delivery|biaya\s*layanan|biaya\s*jasa|biaya\s*antar|biaya\s*aplikasi)(?:\b|[:\s(])/i.test(lower)) {
+                let nums = extractNumbers(line);
+                if (nums.length === 0 && i + 1 < rawLines.length) {
+                    nums = extractNumbers(rawLines[i + 1]);
+                }
+                if (nums.length > 0) {
+                    const val = nums[nums.length - 1];
+                    if (val > 0) {
+                        detectedSurcharges.push({ line: line.trim(), amount: val });
+                    }
+                }
+                continue;
+            }
+
+            // Detect Discounts / Promo
+            if (/(?:^|\b)(diskon|discount|promo|potongan|voucher|hemat)(?:\b|[:\s])/i.test(lower)) {
+                let nums = extractNumbers(line);
+                if (nums.length === 0 && i + 1 < rawLines.length) {
+                    nums = extractNumbers(rawLines[i + 1]);
+                }
+                if (nums.length > 0) {
+                    const val = nums[nums.length - 1];
+                    if (val > 0) {
+                        detectedDiscounts.push({ line: line.trim(), amount: val });
+                    }
+                }
+                continue;
+            }
+
+            // Detect Grand Total / Total / Total Pembayaran / Total Dibayar / Due / Amount
+            if (/(?:^|\b)(grand\s*total|total\s*bayar|total\s*dibayar|total\s*akhir|total\s*tagihan|total\s*pembayaran|total|tolal|tota[l1|i!]|tot\b|due|amount)(?:\b|[:\s])/i.test(lower)) {
                 if (!lower.includes('item') && !lower.includes('qty') && !lower.includes('porsi') && !lower.includes('diskon')) {
                     let nums = extractNumbers(line);
                     if (nums.length === 0 && i + 1 < rawLines.length) {
                         nums = extractNumbers(rawLines[i + 1]);
                     }
-                    if (nums.length > 0 && !detectedTotal) {
+                    if (nums.length > 0) {
                         detectedTotal = nums[nums.length - 1];
                     }
                     continue;
@@ -158,15 +242,16 @@ const OCR = {
 
             if (isIgnoredRow(lower)) continue;
 
-            // Pattern 1: Same-line item (e.g. '1 Paket Nasi Ayam... @Rp36.500 Rp36.500' or '2 PERKEDEL JAGUNG Rp10.000')
+            // Pattern 1: Same-line item (e.g. 'N.Ayam Bakar x2 Rp94.000' or '1 Paket Nasi Ayam... @Rp36.500 Rp36.500')
             const sameLineMatch = line.match(/^(.+?)(?:\s+|[\.:\-_=]+)\s*(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{3,8})$/i);
             if (sameLineMatch) {
-                const nameCandidate = cleanItemName(sameLineMatch[1]);
+                const { name: nameCandidate, qty } = extractQtyAndCleanName(sameLineMatch[1], items.length + 1);
                 const price = parseInt(sameLineMatch[2].replace(/[\.,]/g, ''), 10);
                 if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
                     items.push({
                         name: nameCandidate,
-                        price: formatNumber(price)
+                        price: formatNumber(price),
+                        qty: qty
                     });
                     continue;
                 }
@@ -179,12 +264,20 @@ const OCR = {
                     const nums = extractNumbers(nextLine);
                     if (nums.length > 0) {
                         const price = nums[nums.length - 1];
-                        const nameCandidate = cleanItemName(line);
+                        let { name: nameCandidate, qty } = extractQtyAndCleanName(line, items.length + 1);
+
+                        if (qty === 1) {
+                            const nextQtyMatch = nextLine.match(/(?:^|\s)(?:x\s*(\d{1,2})|(\d{1,2})\s*x|qty\s*[:\.]?\s*(\d{1,2})|(\d{1,2})\s*(?:pcs|pc|porsi|cup|btl|ptg|bh|paket))\b/i);
+                            if (nextQtyMatch) {
+                                qty = parseInt(nextQtyMatch[1] || nextQtyMatch[2] || nextQtyMatch[3] || nextQtyMatch[4], 10) || 1;
+                            }
+                        }
 
                         if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
                             items.push({
                                 name: nameCandidate,
-                                price: formatNumber(price)
+                                price: formatNumber(price),
+                                qty: qty
                             });
                             i++;
                             continue;
@@ -194,12 +287,49 @@ const OCR = {
             }
         }
 
+        const surchargeSum = detectedSurcharges.reduce((acc, s) => acc + s.amount, 0);
+        const discountSum = detectedDiscounts.reduce((acc, d) => acc + d.amount, 0);
+
         if (!detectedSubtotal && items.length > 0) {
             const sum = items.reduce((acc, it) => {
                 const p = parseInt(String(it.price).replace(/[^0-9]/g, ''), 10);
                 return acc + (isNaN(p) ? 0 : p);
             }, 0);
             if (sum > 0) detectedSubtotal = sum;
+        }
+
+        const calculatedFromSubtotal = detectedSubtotal ? (detectedSubtotal + surchargeSum - discountSum) : 0;
+
+        // Fallback or correction for detectedTotal:
+        // Case 1: detectedTotal is severely truncated (e.g. 398 instead of 398.500)
+        if (detectedTotal && detectedTotal < 1000 && detectedSubtotal && detectedSubtotal >= 10000) {
+            if (calculatedFromSubtotal > 0 && String(calculatedFromSubtotal).startsWith(String(detectedTotal))) {
+                detectedTotal = calculatedFromSubtotal;
+            } else if (surchargeSum > 0 && calculatedFromSubtotal > detectedSubtotal) {
+                detectedTotal = calculatedFromSubtotal;
+            } else if (detectedTotal * 1000 >= detectedSubtotal * 0.5) {
+                detectedTotal = detectedTotal * 1000;
+            }
+        }
+
+        // Case 2: detectedTotal is missing or identical to subtotal while surcharges exist
+        if (!detectedTotal || (detectedTotal === detectedSubtotal && surchargeSum > 0)) {
+            // Check bottom lines for grand total
+            for (let j = rawLines.length - 1; j >= 0; j--) {
+                const l = rawLines[j].toLowerCase();
+                if (isStopFooter(l)) continue;
+                const nums = extractNumbers(rawLines[j]);
+                if (nums.length > 0) {
+                    const lastNum = nums[nums.length - 1];
+                    if (detectedSubtotal && lastNum > detectedSubtotal) {
+                        detectedTotal = lastNum;
+                        break;
+                    }
+                }
+            }
+            if ((!detectedTotal || detectedTotal === detectedSubtotal) && calculatedFromSubtotal > 0) {
+                detectedTotal = calculatedFromSubtotal;
+            }
         }
 
         if (!detectedTotal && detectedSubtotal) {
@@ -209,6 +339,10 @@ const OCR = {
         return {
             subtotal: detectedSubtotal ? formatNumber(detectedSubtotal) : null,
             total: detectedTotal ? formatNumber(detectedTotal) : null,
+            surcharges: detectedSurcharges,
+            totalSurcharges: surchargeSum,
+            discounts: detectedDiscounts,
+            totalDiscounts: discountSum,
             items,
             rawText: text
         };

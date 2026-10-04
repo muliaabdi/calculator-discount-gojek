@@ -152,6 +152,34 @@
 
         <main class="max-w-4xl mx-auto px-4 pt-3 sm:pt-5 w-full space-y-4 sm:space-y-5">
 
+            <!-- Shared Bill Active Banner -->
+            <template x-if="isSharedBillView">
+                <div class="bg-gradient-to-r from-brand-600 via-emerald-600 to-teal-700 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 border border-white/10 animate-fade-in">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                            <span x-text="t('sharedBillBadge')">Tagihan Bersama Dibagikan</span>
+                        </div>
+                        <h2 class="text-base sm:text-lg font-black tracking-tight" x-text="t('sharedBillHeading')">Pilih Menu yang Kamu Pesan</h2>
+                        <p class="text-xs text-white/90 leading-relaxed max-w-xl" x-text="t('sharedBillDesc')">
+                            Centang kotak pada makanan/minuman yang kamu pesan di bawah. Total bayar (termasuk pajak & service / diskon) akan dihitung otomatis!
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+                        <button type="button" @click="resetToNewBill"
+                            class="flex-1 sm:flex-none text-xs font-bold px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl border border-white/25 transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            <span x-text="t('newBillBtn')">Buat Patungan Baru</span>
+                        </button>
+                    </div>
+                </div>
+            </template>
+
             <!-- Parameter Struk Card -->
             <section
                 class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm relative overflow-hidden">
@@ -216,11 +244,33 @@
                     </div>
                 </div>
 
-                <!-- Live Saving Stats Banner -->
+                <!-- Smart Helper: Jika Total 1 & Total 2 sama-sama diisi Grand Total, tapi ada subtotal menu yang lebih kecil -->
+                <template x-if="isValidParameters && parsedTotalPrice === parsedTotalAmount && sumMenuPrices > 0 && sumMenuPrices < parsedTotalPrice">
+                    <div class="mt-3.5 p-3 rounded-xl bg-amber-50 border border-amber-300/80 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div class="flex items-start gap-2">
+                            <span class="text-base leading-none">💡</span>
+                            <div>
+                                <span class="font-bold">Total Menu terdeteksi Rp <span x-text="formatNumber(sumMenuPrices)"></span></span>, namun kotak "1. Total Menu / Subtotal" diisi Rp <span x-text="formatNumber(parsedTotalPrice)"></span> (sama dengan Grand Total).
+                                <div class="text-[11px] text-amber-700 mt-0.5">
+                                    Klik tombol untuk aktifkan perhitungan proporsional Pajak & Service (+Rp <span x-text="formatNumber(parsedTotalAmount - sumMenuPrices)"></span>).
+                                </div>
+                            </div>
+                        </div>
+                        <button @click="applySumAsOriginalPrice" type="button"
+                            class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-1">
+                            <span>Pas-kan Subtotal (Rp <span x-text="formatNumber(sumMenuPrices)"></span>)</span>
+                        </button>
+                    </div>
+                </template>
+
+                <!-- Live Saving / Surcharge Stats Banner -->
                 <template x-if="isValidParameters">
                     <div
-                        class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2.5">
+                        class="mt-4 p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-2"
+                        :class="isSurchargeMode ? 'bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-amber-200/90' : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-emerald-200/80'">
+                        
+                        <!-- Mode Diskon -->
+                        <div x-show="!isSurchargeMode" class="flex items-center gap-2.5">
                             <div
                                 class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -244,6 +294,29 @@
                             </div>
                         </div>
 
+                        <!-- Mode Pajak & Service (Surcharge) -->
+                        <div x-show="isSurchargeMode" class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-amber-900" x-text="t('taxAndService')"></div>
+                                <div class="text-sm font-extrabold text-amber-800">
+                                    <span>+Rp <span x-text="formatNumber(totalSurchargeAmount)"></span></span>
+                                    <span
+                                        class="text-xs font-bold px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-900 ml-1">
+                                        +<span x-text="surchargePercentage"></span>%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="text-right text-xs text-slate-500 font-medium">
                             <span x-text="t('payRatio') + ': '"></span><span class="font-bold text-slate-700"><span
                                     x-text="payRatioPercent"></span>%</span> <span x-text="t('ofMenuPrice')"></span>
@@ -254,26 +327,39 @@
 
             <!-- Menu / Pemesan Section -->
             <section class="space-y-3">
-                <div class="flex items-center justify-between px-1">
+                <div class="flex items-center justify-between px-1 flex-wrap gap-2">
                     <div>
                         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700"
                             x-text="t('menuAndDiners')"></h2>
-                        <p class="text-xs text-slate-400" x-text="t('menuDinersSubtitle')"></p>
+                        <p class="text-xs text-slate-400" x-text="t('claimMyItemsHint')"></p>
                     </div>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
-                        <span x-text="state.persons.length"></span> Menu
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <template x-if="selectedPersonIds.length > 0">
+                            <button @click="clearPersonSelection" type="button"
+                                class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2 py-0.5 rounded transition"
+                                x-text="t('unselectAll')">
+                            </button>
+                        </template>
+                        <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
+                            <span x-text="state.persons.length"></span> Menu
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Cards List -->
                 <div class="relative space-y-3">
                     <template x-for="(person, idx) in state.persons" :key="person.id">
                         <div
-                            class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-sm hover:border-slate-300 hover:shadow-md transition-all group relative">
+                            class="bg-white rounded-2xl p-3.5 sm:p-4 border shadow-sm hover:shadow-md transition-all group relative"
+                            :class="selectedPersonIds.includes(person.id) ? 'border-brand-500 ring-2 ring-brand-500/15 bg-brand-50/25' : 'border-slate-200/80 hover:border-slate-300'">
 
                             <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-                                <!-- Nomor urut & Nama Pemesan -->
-                                <div class="flex items-center gap-2 flex-1 min-w-[140px]">
+                                <!-- Checkbox Klaim & Nomor urut & Nama Pemesan -->
+                                <div class="flex items-center gap-2.5 flex-1 min-w-[140px]">
+                                    <input type="checkbox" :checked="selectedPersonIds.includes(person.id)"
+                                        @change="togglePersonSelection(person.id)"
+                                        title="Pilih sebagai menu saya"
+                                        class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer shrink-0">
                                     <div
                                         class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center shrink-0">
                                         <span x-text="idx + 1"></span>
@@ -321,32 +407,109 @@
                                         </div>
                                     </div>
 
-                                    <!-- Hemat Badge -->
-                                    <div x-show="isValidParameters && parseNum(person.price) > 0 && calculatePersonSaving(person) > 0"
+                                    <!-- Hemat / Pajak & Service Badge -->
+                                    <div x-show="isValidParameters && parseNum(person.price) > 0"
                                         class="text-right sm:ml-auto">
-                                        <span
-                                            class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
-                                            <span x-text="t('saved')"></span> Rp <span
-                                                x-text="formatNumber(calculatePersonSaving(person))"></span>
-                                        </span>
+                                        <template x-if="!isSurchargeMode && calculatePersonSaving(person) > 0">
+                                            <span
+                                                class="text-[11px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full inline-block">
+                                                <span x-text="t('saved')"></span> Rp <span
+                                                    x-text="formatNumber(calculatePersonSaving(person))"></span>
+                                            </span>
+                                        </template>
+                                        <template x-if="isSurchargeMode && calculatePersonExtra(person) > 0">
+                                            <span
+                                                class="text-[11px] font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full inline-block">
+                                                +Rp <span x-text="formatNumber(calculatePersonExtra(person))"></span>
+                                                <span class="text-[10px] font-normal text-amber-900" x-text="t('extraCharge')"></span>
+                                            </span>
+                                        </template>
                                     </div>
                                 </div>
 
-                                <!-- Delete button -->
-                                <button x-show="state.persons.length > 1" @click="removeRow(idx)" type="button"
-                                    class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90 self-end sm:self-center shrink-0"
-                                    title="Hapus baris">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                    </svg>
-                                </button>
+                                <!-- Row Actions -->
+                                <div class="flex items-center gap-1 self-end sm:self-center shrink-0">
+                                    <!-- Split button (Bagi 2 porsi) -->
+                                    <button @click="splitPersonRow(idx)" type="button"
+                                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 flex items-center justify-center transition active:scale-90"
+                                        :title="t('splitRowTooltip')">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Delete button -->
+                                    <button x-show="state.persons.length > 1" @click="removeRow(idx)" type="button"
+                                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition active:scale-90"
+                                        title="Hapus baris">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </template>
+                </div>
+
+                <!-- Selected "My Bill" Summary Floating Card -->
+                <div x-show="selectedPersons.length > 0" x-transition.opacity.duration.200ms
+                    class="sticky bottom-4 z-20 bg-slate-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-xl border border-slate-700/80 space-y-3">
+                    <div class="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold">
+                                <span x-text="selectedPersons.length"></span>
+                            </span>
+                            <span class="font-bold text-sm text-slate-100" x-text="t('myBillTitle')">Tagihan Menu Saya</span>
+                        </div>
+                        <button @click="clearPersonSelection" type="button"
+                            class="text-xs text-slate-400 hover:text-white transition"
+                            x-text="t('unselectAll')">
+                            Batal
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="text-xs space-y-1">
+                            <div class="flex items-center gap-2 text-slate-300">
+                                <span x-text="t('myBillTotalMenu') + ':'">Total Menu Saya:</span>
+                                <span class="font-semibold text-white">Rp <span x-text="formatNumber(selectedTotalMenuPrice)"></span></span>
+                            </div>
+                            <template x-if="isSurchargeMode">
+                                <div class="text-amber-400 text-[11px] font-medium">
+                                    <span>Pajak & Service (+<span x-text="surchargePercentage"></span>%): +Rp <span x-text="formatNumber(selectedTotalExtra)"></span></span>
+                                </div>
+                            </template>
+                            <template x-if="isDiscountMode">
+                                <div class="text-emerald-400 text-[11px] font-medium">
+                                    <span>Hemat Diskon (-<span x-text="discountPercentage"></span>%): -Rp <span x-text="formatNumber(selectedTotalSaving)"></span></span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                            <div>
+                                <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider" x-text="t('myBillNetPay')">TOTAL SAYA BAYAR</div>
+                                <div class="text-lg sm:text-xl font-extrabold text-emerald-400 leading-tight">
+                                    Rp <span x-text="formatNumber(selectedTotalShare)"></span>
+                                </div>
+                            </div>
+
+                            <button @click="copyMyBill" type="button"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span x-text="t('copyMyBillBtn')">Salin Tagihan Saya</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tombol Tambah Menu -->
@@ -527,14 +690,25 @@
                 </div>
 
                 <div class="flex items-center gap-2">
+                    <!-- Share Link Button -->
+                    <button @click="shareTab = 'link'; openShareModal()" type="button" :disabled="!isValidParameters"
+                        class="px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-slate-700 border border-slate-200 transition flex items-center gap-1.5 shadow-2xs">
+                        <svg class="w-4 h-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span class="hidden sm:inline" x-text="t('shareLinkBtn')">Bagikan Link</span>
+                        <span class="sm:hidden">Link</span>
+                    </button>
+
                     <!-- Share WA Button -->
-                    <button @click="openShareModal" type="button" :disabled="!isValidParameters"
+                    <button @click="shareTab = 'text'; openShareModal()" type="button" :disabled="!isValidParameters"
                         class="px-4 py-2.5 rounded-xl font-bold text-sm bg-brand-500 hover:bg-brand-600 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-white shadow-md shadow-brand-500/25 transition flex items-center gap-2">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
                         </svg>
-                        <span x-text="lang === 'en' ? 'Share' : 'Bagi ke WA'"></span>
+                        <span x-text="lang === 'en' ? 'Share WA' : 'Bagi ke WA'"></span>
                     </button>
                 </div>
             </div>
@@ -565,7 +739,7 @@
                                     x-text="lang === 'en' ? 'Group' : 'Grup'"></span>
                             </h3>
                             <p class="text-[11px] text-emerald-100/80"
-                                x-text="lang === 'en' ? 'Online • Ready to share' : 'Online • Siap dibagikan ke WhatsApp'">
+                                x-text="lang === 'en' ? 'Online • Ready to share' : 'Online • Siap dibagikan ke teman'">
                             </p>
                         </div>
                     </div>
@@ -583,13 +757,23 @@
                     </div>
                 </div>
 
-                <!-- Tab Switcher: Teks WhatsApp vs Gambar Struk -->
+                <!-- Tab Switcher: Link vs Teks WhatsApp vs Gambar Struk -->
                 <div
                     class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
                     <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200/70 w-full sm:w-auto">
+                        <button type="button" @click="shareTab = 'link'"
+                            :class="shareTab === 'link' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                            <span x-text="t('shareLinkTab')">Link Pilih Menu</span>
+                        </button>
                         <button type="button" @click="shareTab = 'text'"
                             :class="shareTab === 'text' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                            class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -598,7 +782,7 @@
                         </button>
                         <button type="button" @click="shareTab = 'image'"
                             :class="shareTab === 'image' ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                            class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -612,6 +796,64 @@
 
                 <!-- Modal Body / Content -->
                 <div class="p-3 sm:p-4 overflow-y-auto bg-[#EFEAE2] flex-1">
+
+                    <!-- TAB 0: Share Link Interaktif (Teman Pilih Sendiri) -->
+                    <div x-show="shareTab === 'link'" class="space-y-3">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                    </svg>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <h4 class="text-sm font-bold text-slate-800" x-text="t('shareLinkTitle')">Bagikan Link Patungan</h4>
+                                    <p class="text-xs text-slate-500 leading-relaxed" x-text="t('shareLinkDesc')">
+                                        Teman bisa buka link ini dan langsung memilih makanan/minumannya sendiri. Rincian bayar dihitung otomatis!
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Link input + Copy Button -->
+                            <div class="relative flex items-center gap-2">
+                                <input type="text" readonly :value="shareableBillLink" @click="$event.target.select()"
+                                    class="w-full px-3 py-2 text-xs font-mono text-slate-600 bg-slate-50 border border-slate-200 rounded-xl outline-none select-all">
+                                <button type="button" @click="copyShareLink"
+                                    class="px-3.5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shrink-0 active:scale-95 flex items-center gap-1.5 shadow-sm">
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    <span x-text="linkCopied ? t('linkCopiedSuccess') : t('copyLinkBtn')"></span>
+                                </button>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
+                                <button type="button" @click="openWhatsAppWithLink"
+                                    class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-[#25D366] hover:bg-[#20ba59] text-white transition flex items-center justify-center gap-2 shadow-xs active:scale-95">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    </svg>
+                                    <span x-text="t('sendWaWithLink')">Kirim Link ke WhatsApp</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mini guide for friends -->
+                        <div class="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-3.5 text-xs text-emerald-900 space-y-1.5">
+                            <div class="font-bold flex items-center gap-1.5 text-emerald-800">
+                                <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                <span x-text="lang === 'en' ? 'How it works for your friends:' : 'Cara kerja untuk temanmu:'"></span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-emerald-800/90 text-[11px] leading-relaxed">
+                                <li x-text="lang === 'en' ? 'Friend opens link & sees this exact receipt.' : 'Teman membuka link & langsung melihat daftar menu ini.'"></li>
+                                <li x-text="lang === 'en' ? 'They tick the checkboxes for items they ordered.' : 'Mereka centang kotak pada menu yang mereka pesan.'"></li>
+                                <li x-text="lang === 'en' ? 'The app automatically calculates their exact fair share + tax/service.' : 'Aplikasi langsung menghitung total bayar mereka + pajak/service proporsional.'"></li>
+                                <li x-text="lang === 'en' ? 'They can click \"Copy My Bill\" and send transfer proof.' : 'Mereka bisa klik \"Salin Tagihan Saya\" dan langsung transfer!'"></li>
+                            </ol>
+                        </div>
+                    </div>
 
                     <!-- TAB 1: Teks WhatsApp Preview (PERSIS sama seperti yang disalin) -->
                     <div x-show="shareTab === 'text'" class="space-y-2.5">
@@ -665,11 +907,18 @@
                                         <span>Rp <span x-text="formatNumber(parsedTotalAmount)"></span></span>
                                     </div>
                                     <div
-                                        class="flex justify-between font-bold text-brand-600 pt-1 border-t border-slate-100">
-                                        <span x-text="t('discountSaving')"></span>
-                                        <span>Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span
-                                                x-text="discountPercentage"></span>% <span
-                                                x-text="t('off')"></span>)</span>
+                                        class="flex justify-between font-bold pt-1 border-t border-slate-100"
+                                        :class="isSurchargeMode ? 'text-amber-800' : 'text-brand-600'">
+                                        <span x-text="isSurchargeMode ? t('taxAndService') : t('discountSaving')"></span>
+                                        <template x-if="!isSurchargeMode">
+                                            <span>Rp <span x-text="formatNumber(totalDiscountAmount)"></span> (<span
+                                                    x-text="discountPercentage"></span>% <span
+                                                    x-text="t('off')"></span>)</span>
+                                        </template>
+                                        <template x-if="isSurchargeMode">
+                                            <span>+Rp <span x-text="formatNumber(totalSurchargeAmount)"></span> (+<span
+                                                    x-text="surchargePercentage"></span>%)</span>
+                                        </template>
                                     </div>
                                 </div>
 
@@ -687,9 +936,16 @@
                                             <div class="text-[11px] text-slate-500 flex justify-between mt-1">
                                                 <span><span x-text="t('menuPrice')"></span> Rp <span
                                                         x-text="formatNumber(person.price)"></span></span>
-                                                <span class="text-emerald-600 font-semibold"><span
-                                                        x-text="t('saved')"></span>: Rp <span
-                                                        x-text="formatNumber(calculatePersonSaving(person))"></span></span>
+                                                <template x-if="!isSurchargeMode">
+                                                    <span class="text-emerald-600 font-semibold"><span
+                                                            x-text="t('saved')"></span>: Rp <span
+                                                            x-text="formatNumber(calculatePersonSaving(person))"></span></span>
+                                                </template>
+                                                <template x-if="isSurchargeMode">
+                                                    <span class="text-amber-700 font-semibold"><span
+                                                            x-text="t('extraCharge')"></span>: +Rp <span
+                                                            x-text="formatNumber(calculatePersonExtra(person))"></span></span>
+                                                </template>
                                             </div>
                                         </div>
                                     </template>
@@ -1010,20 +1266,40 @@
                                     </div>
                                 </div>
 
+                                <!-- Surcharge / Tax Detection Notification -->
+                                <template x-if="ocrResult.totalSurcharges && ocrResult.totalSurcharges > 0">
+                                    <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs text-emerald-800 shadow-2xs">
+                                        <div class="flex items-center gap-1.5 font-medium">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            <span>
+                                                <strong x-text="t('surchargeDetected')">Pajak & Biaya Tambahan Terdeteksi:</strong>
+                                                +Rp <span x-text="formatNumber(ocrResult.totalSurcharges)"></span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[11px] text-emerald-700 font-semibold" x-text="t('surchargeIncludedHint')">Sudah dihitung ke Total Akhir</span>
+                                    </div>
+                                </template>
+
                                 <!-- Menu Items list -->
                                 <div
                                     class="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-2.5">
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
                                         <div class="text-xs font-bold text-slate-700 flex items-center gap-1">
                                             <span x-text="t('detectedMenus')">Menu Terdeteksi</span>
                                             <span>(</span>
                                             <span x-text="ocrResult.items.length"></span>
                                             <span>):</span>
                                         </div>
-                                        <button @click="addOcrItem" type="button"
-                                            class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-2 py-1 rounded-md transition flex items-center gap-1">
-                                            <span x-text="t('addMenuBtn')">+ Tambah</span>
-                                        </button>
+                                        <div class="flex items-center gap-2.5">
+                                            <label class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer select-none">
+                                                <input type="checkbox" x-model="ocrAutoSplitQty" class="rounded text-brand-600 focus:ring-brand-500 w-3.5 h-3.5 border-slate-300">
+                                                <span x-text="t('ocrAutoSplitLabel')">Pecah otomatis porsi > 1</span>
+                                            </label>
+                                            <button @click="addOcrItem" type="button"
+                                                class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-2 py-1 rounded-md transition flex items-center gap-1">
+                                                <span x-text="t('addMenuBtn')">+ Tambah</span>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <template x-if="ocrResult.items.length === 0">
@@ -1036,31 +1312,50 @@
 
                                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
                                         <template x-for="(it, idx) in ocrResult.items" :key="idx">
-                                            <div
-                                                class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                                <input type="text" x-model="it.name" :placeholder="t('itemPlaceholder')"
-                                                    class="flex-1 px-2.5 py-1.5 text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
+                                            <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5">
+                                                <div class="flex items-center gap-2">
+                                                    <input type="text" x-model="it.name" :placeholder="t('itemPlaceholder')"
+                                                        class="flex-1 px-2.5 py-1.5 text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
 
-                                                <div class="relative w-28 shrink-0">
-                                                    <span
-                                                        class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
-                                                    <input type="text" inputmode="numeric" x-model="it.price"
-                                                        :placeholder="t('pricePlaceholder')"
-                                                        @keypress="numberOnly($event)"
-                                                        @input="onFormatInput($event, it, 'price')"
-                                                        class="w-full pl-6 pr-2 py-1.5 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
+                                                    <div class="relative w-28 shrink-0">
+                                                        <span
+                                                            class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
+                                                        <input type="text" inputmode="numeric" x-model="it.price"
+                                                            :placeholder="t('pricePlaceholder')"
+                                                            @keypress="numberOnly($event)"
+                                                            @input="onFormatInput($event, it, 'price')"
+                                                            class="w-full pl-6 pr-2 py-1.5 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:border-brand-500">
+                                                    </div>
+
+                                                    <button @click="removeOcrItem(idx)" type="button"
+                                                        class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                                        title="Hapus baris">
+                                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
+                                                    </button>
                                                 </div>
 
-                                                <button @click="removeOcrItem(idx)" type="button"
-                                                    class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
-                                                    title="Hapus baris">
-                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round">
-                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                    </svg>
-                                                </button>
+                                                <!-- Qty > 1 badge & quick split action -->
+                                                <div x-show="it.qty && it.qty > 1" class="flex items-center justify-between px-2 py-1 rounded-lg bg-amber-50/90 border border-amber-200/80 text-[11px] text-amber-800">
+                                                    <div class="flex items-center gap-1.5 font-medium">
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 font-bold bg-amber-200 text-amber-900 rounded text-[10px]" x-text="'x' + it.qty"></span>
+                                                        <span>
+                                                            <span class="text-amber-700/80" x-text="t('portionUnit') + ':'"></span>
+                                                            <strong x-show="parseNum(it.price) > 0">
+                                                                Rp <span x-text="formatNumber(Math.round(parseNum(it.price) / it.qty))"></span>
+                                                            </strong>
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" @click="splitOcrItem(idx)"
+                                                        class="inline-flex items-center gap-1 font-bold text-amber-900 hover:text-amber-950 bg-amber-200/70 hover:bg-amber-300/80 px-2 py-0.5 rounded transition active:scale-95 shadow-2xs">
+                                                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                                                        <span x-text="t('splitNow')">Pecah Sekarang</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </template>
                                     </div>
