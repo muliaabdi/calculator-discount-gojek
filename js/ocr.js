@@ -232,9 +232,19 @@ const OCR = {
                     let nums = extractNumbers(line);
                     if (nums.length === 0 && i + 1 < rawLines.length) {
                         nums = extractNumbers(rawLines[i + 1]);
+                        if (nums.length > 0) i++;
                     }
                     if (nums.length > 0) {
-                        detectedTotal = nums[nums.length - 1];
+                        let tVal = nums[nums.length - 1];
+                        // If tVal < 1000 and next line has 3 digits (e.g. 398 on this line, 500 on next line due to thumb or paper fold)
+                        if (tVal < 1000 && i + 1 < rawLines.length) {
+                            const nextNums = extractNumbers(rawLines[i + 1]);
+                            if (nextNums.length > 0 && nextNums[0] >= 100 && nextNums[0] <= 999) {
+                                tVal = tVal * 1000 + nextNums[0];
+                                i++; // consume next line
+                            }
+                        }
+                        detectedTotal = tVal;
                     }
                     continue;
                 }
@@ -302,12 +312,16 @@ const OCR = {
 
         // Fallback or correction for detectedTotal:
         // Case 1: detectedTotal is severely truncated (e.g. 398 instead of 398.500)
-        if (detectedTotal && detectedTotal < 1000 && detectedSubtotal && detectedSubtotal >= 10000) {
+        if (detectedTotal && detectedTotal < 1000) {
             if (calculatedFromSubtotal > 0 && String(calculatedFromSubtotal).startsWith(String(detectedTotal))) {
                 detectedTotal = calculatedFromSubtotal;
-            } else if (surchargeSum > 0 && calculatedFromSubtotal > detectedSubtotal) {
+            } else if (calculatedFromSubtotal > 0 && surchargeSum > 0) {
                 detectedTotal = calculatedFromSubtotal;
-            } else if (detectedTotal * 1000 >= detectedSubtotal * 0.5) {
+            } else if (detectedSubtotal && (detectedTotal * 1000 >= detectedSubtotal * 0.5)) {
+                detectedTotal = detectedTotal * 1000;
+            } else if (calculatedFromSubtotal > 0) {
+                detectedTotal = calculatedFromSubtotal;
+            } else {
                 detectedTotal = detectedTotal * 1000;
             }
         }

@@ -77,9 +77,11 @@ function calculator() {
             } catch (e) { }
         },
 
-        t(key) {
+        t(key, fallback = '') {
             const dict = (window.I18N && window.I18N[this.lang]) || (window.I18N && window.I18N.id) || {};
-            return dict[key] || (window.I18N && window.I18N.id && window.I18N.id[key]) || key;
+            if (dict && dict[key]) return dict[key];
+            if (window.I18N && window.I18N.id && window.I18N.id[key]) return window.I18N.id[key];
+            return fallback || key;
         },
 
         showToast(msg) {
