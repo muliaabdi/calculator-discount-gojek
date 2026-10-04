@@ -71,7 +71,7 @@
         rel="stylesheet">
 
     <!-- Compiled Static Stylesheet (Tailwind v4 Minified) -->
-    <link rel="stylesheet" href="css/style.min.css">
+    <link rel="stylesheet" href="css/style.min.css?v=1.1.6">
 
     <!-- Global Cursor Pointer & Interactive Fix -->
     <style>
@@ -253,7 +253,7 @@
                                 :class="isSharedBillView ? 'bg-slate-100 text-slate-500 cursor-not-allowed select-none opacity-80' : 'bg-slate-50 text-slate-800 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10'"
                                 placeholder="Contoh: 120.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_price')"
-                                class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl font-bold placeholder:text-slate-300 placeholder:font-normal outline-none transition shadow-sm">
+                                class="w-full pl-11 pr-4 py-3 bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-bold placeholder:text-slate-300 placeholder:font-normal outline-none transition shadow-sm">
                         </div>
                     </div>
 
@@ -274,7 +274,7 @@
                                 :class="isSharedBillView ? 'bg-emerald-100/50 text-emerald-800 cursor-not-allowed select-none opacity-80' : 'bg-emerald-50/60 text-emerald-900 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10'"
                                 placeholder="Contoh: 75.000" @keypress="numberOnly($event)"
                                 @input="onFormatInput($event, state, 'total_ammount')"
-                                class="w-full pl-11 pr-4 py-3 border border-emerald-300 rounded-xl font-bold placeholder:text-emerald-300 placeholder:font-normal outline-none transition shadow-sm">
+                                class="w-full pl-11 pr-4 py-3 bg-emerald-50/60 text-emerald-900 border border-emerald-300 rounded-xl font-bold placeholder:text-emerald-300 placeholder:font-normal outline-none transition shadow-sm">
                         </div>
                     </div>
                 </div>
@@ -301,14 +301,15 @@
                 <!-- Live Saving / Surcharge Stats Banner -->
                 <template x-if="isValidParameters">
                     <div
-                        class="mt-4 p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-2"
-                        :class="isSurchargeMode ? 'bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-amber-200/90' : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-emerald-200/80'">
+                        class="mt-4 p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-2 transition"
+                        :class="isSurchargeMode ? 'bg-amber-50/90 border-amber-300/80' : 'bg-emerald-50/80 border-emerald-200/80'">
                         
                         <!-- Mode Diskon -->
                         <div x-show="!isSurchargeMode" class="flex items-center gap-2.5">
                             <div
-                                class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0"
+                                style="background-color: #059669;">
+                                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path
                                         d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z">
@@ -332,12 +333,14 @@
                         <!-- Mode Pajak & Service (Surcharge) -->
                         <div x-show="isSurchargeMode" class="flex items-center gap-2.5">
                             <div
-                                class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-sm shrink-0"
+                                style="background-color: #d97706;">
+                                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
+                                    <line x1="8" y1="8" x2="16" y2="8"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                    <line x1="8" y1="16" x2="13" y2="16"/>
                                 </svg>
                             </div>
                             <div>
@@ -345,7 +348,7 @@
                                 <div class="text-sm font-extrabold text-amber-800">
                                     <span>+Rp <span x-text="formatNumber(totalSurchargeAmount)"></span></span>
                                     <span
-                                        class="text-xs font-bold px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-900 ml-1">
+                                        class="text-xs font-bold px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 ml-1">
                                         +<span x-text="surchargePercentage"></span>%
                                     </span>
                                 </div>
