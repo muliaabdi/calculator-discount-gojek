@@ -80,6 +80,10 @@ function calculator() {
                         this.state.total_ammount = this.lockedBillPayload.ta;
                         reverted = true;
                     }
+                    if (this.state.payment_info !== (this.lockedBillPayload.pi || '')) {
+                        this.state.payment_info = this.lockedBillPayload.pi || '';
+                        reverted = true;
+                    }
                     if (this.lockedBillPayload.m && Array.isArray(this.state.persons)) {
                         this.lockedBillPayload.m.forEach((locked, i) => {
                             if (this.state.persons[i]) {
@@ -687,6 +691,19 @@ function calculator() {
                 }
             } catch (e) {
                 this.showToast('Gagal menyalin teks');
+            }
+        },
+
+        async copyPaymentInfo() {
+            if (!this.state.payment_info) return;
+            try {
+                await navigator.clipboard.writeText(this.state.payment_info);
+                this.showToast(this.t('paymentInfoCopied', 'Info rekening/pembayaran berhasil disalin!'));
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+                }
+            } catch (e) {
+                this.showToast('Gagal menyalin info pembayaran');
             }
         },
 
