@@ -460,16 +460,16 @@
 
                 <!-- Selected "My Bill" Summary Floating Card -->
                 <div x-show="selectedPersons.length > 0" x-transition.opacity.duration.200ms
-                    class="sticky bottom-4 z-20 bg-slate-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-xl border border-slate-700/80 space-y-3">
-                    <div class="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-2">
+                    class="sticky bottom-4 z-20 bg-white p-4 sm:p-5 rounded-2xl shadow-xl border-2 border-brand-500 space-y-3">
+                    <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                         <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold">
+                            <span class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-black shadow-xs">
                                 <span x-text="selectedPersons.length"></span>
                             </span>
-                            <span class="font-bold text-sm text-slate-100" x-text="t('myBillTitle')">Tagihan Menu Saya</span>
+                            <span class="font-extrabold text-sm text-slate-800" x-text="t('myBillTitle')">Tagihan Menu Saya</span>
                         </div>
                         <button @click="clearPersonSelection" type="button"
-                            class="text-xs text-slate-400 hover:text-white transition"
+                            class="text-xs font-semibold text-slate-400 hover:text-rose-600 transition"
                             x-text="t('unselectAll')">
                             Batal
                         </button>
@@ -477,32 +477,32 @@
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div class="text-xs space-y-1">
-                            <div class="flex items-center gap-2 text-slate-300">
+                            <div class="flex items-center gap-2 text-slate-600">
                                 <span x-text="t('myBillTotalMenu') + ':'">Total Menu Saya:</span>
-                                <span class="font-semibold text-white">Rp <span x-text="formatNumber(selectedTotalMenuPrice)"></span></span>
+                                <span class="font-bold text-slate-900">Rp <span x-text="formatNumber(selectedTotalMenuPrice)"></span></span>
                             </div>
                             <template x-if="isSurchargeMode">
-                                <div class="text-amber-400 text-[11px] font-medium">
+                                <div class="text-amber-700 text-[11px] font-semibold">
                                     <span>Pajak & Service (+<span x-text="surchargePercentage"></span>%): +Rp <span x-text="formatNumber(selectedTotalExtra)"></span></span>
                                 </div>
                             </template>
                             <template x-if="isDiscountMode">
-                                <div class="text-emerald-400 text-[11px] font-medium">
+                                <div class="text-emerald-700 text-[11px] font-semibold">
                                     <span>Hemat Diskon (-<span x-text="discountPercentage"></span>%): -Rp <span x-text="formatNumber(selectedTotalSaving)"></span></span>
                                 </div>
                             </template>
                         </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                        <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                             <div>
-                                <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider" x-text="t('myBillNetPay')">TOTAL SAYA BAYAR</div>
-                                <div class="text-lg sm:text-xl font-extrabold text-emerald-400 leading-tight">
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" x-text="t('myBillNetPay')">TOTAL SAYA BAYAR</div>
+                                <div class="text-lg sm:text-xl font-black text-brand-600 leading-tight">
                                     Rp <span x-text="formatNumber(selectedTotalShare)"></span>
                                 </div>
                             </div>
 
                             <button @click="copyMyBill" type="button"
-                                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                                class="px-4 py-2.5 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white transition flex items-center gap-1.5 shadow-md shadow-brand-500/25 active:scale-95">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
