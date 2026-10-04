@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00B11A"/>
+      <stop offset="50%" stop-color="#009A15"/>
+      <stop offset="100%" stop-color="#006C0E"/>
+    </linearGradient>
+    <linearGradient id="splitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E2F9E5"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFDD00"/>
+      <stop offset="100%" stop-color="#FFAA00"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#003507" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner border for premium depth -->
+  <rect x="4" y="4" width="504" height="504" rx="124" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="8"/>
+
+  <!-- Main Symbol Group with Soft Drop Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Food Cloche - Left Half -->
+    <path d="M 238 126
+             A 20 20 0 0 0 220 144
+             L 220 156
+             A 160 160 0 0 0 96 312
+             L 238 312
+             Z"
+          fill="url(#splitGrad)"/>
+
+    <!-- Food Cloche - Right Half -->
+    <path d="M 274 126
+             A 20 20 0 0 1 292 144
+             L 292 156
+             A 160 160 0 0 1 416 312
+             L 274 312
+             Z"
+          fill="url(#splitGrad)"/>
+
+    <!-- Top Handle Knob Top Arc -->
+    <path d="M 238 126 C 238 116 246 108 256 108 C 266 108 274 116 274 126 Z" fill="url(#splitGrad)" opacity="0.9"/>
+
+    <!-- Serving Platter Tray - Left Half -->
+    <rect x="76" y="332" width="162" height="28" rx="14" fill="url(#splitGrad)"/>
+
+    <!-- Serving Platter Tray - Right Half -->
+    <rect x="274" y="332" width="162" height="28" rx="14" fill="url(#splitGrad)"/>
+
+    <!-- Center Discount Token Badge (% inside golden circle badge) -->
+    <g transform="translate(256, 240)">
+      <!-- Outer glow ring -->
+      <circle r="68" fill="#00580B" opacity="0.4"/>
+      <!-- Inner badge circle -->
+      <circle r="60" fill="url(#accentGrad)" stroke="#FFFFFF" stroke-width="6"/>
+
+      <!-- Promo Percent Symbol inside Badge -->
+      <!-- Slash -->
+      <line x1="24" y1="-26" x2="-24" y2="26" stroke="#004D0A" stroke-width="12" stroke-linecap="round"/>
+      <!-- Top-left dot -->
+      <circle cx="-16" cy="-16" r="10" fill="#004D0A"/>
+      <!-- Bottom-right dot -->
+      <circle cx="16" cy="16" r="10" fill="#004D0A"/>
+    </g>
+  </g>
+</svg>
