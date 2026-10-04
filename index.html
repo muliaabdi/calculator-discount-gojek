@@ -154,7 +154,8 @@
 
             <!-- Shared Bill Active Banner -->
             <template x-if="isSharedBillView">
-                <div class="bg-gradient-to-r from-brand-600 via-emerald-600 to-teal-700 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 border border-white/10 animate-fade-in">
+                <div class="bg-emerald-800 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 border border-emerald-700/60 animate-fade-in"
+                    style="background: linear-gradient(135deg, #008f10 0%, #065f46 100%);">
                     <div class="space-y-1">
                         <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold">
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -170,8 +171,8 @@
                     </div>
                     <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                         <button type="button" @click="resetToNewBill"
-                            class="flex-1 sm:flex-none text-xs font-bold px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl border border-white/25 transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            class="flex-1 sm:flex-none text-xs font-bold px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 rounded-xl border border-white/80 transition flex items-center justify-center gap-1.5 active:scale-95 shadow-md">
+                            <svg class="w-3.5 h-3.5 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 5v14M5 12h14"/>
                             </svg>
                             <span x-text="t('newBillBtn')">Buat Patungan Baru</span>
