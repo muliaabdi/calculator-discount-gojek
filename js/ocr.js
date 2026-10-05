@@ -109,14 +109,28 @@ const OCR = {
                    /^(terima\s*kasih|thank\s*you|hatur\s*nuhun|matur\s*nuwun|kunjungan)/i.test(lower);
         };
 
+        const isHeaderMetadata = (lower) => {
+            return /(?:^|\b)(pin\b|gofood\s*pin|otp\b|order\s*id|transaksi|trans\s*id|antrian|queue|no\s*struk|no\s*order|pickup\s*code|check\s*in)/i.test(lower);
+        };
+
+        const isNegativeDiscountLine = (str) => {
+            return /-\s*(?:rp\.?\s*)?\d+/i.test(str);
+        };
+
+        const isModifierLine = (name) => {
+            return /^(?:extra|normal|less|no\b|add\b|topping|shoot|shot|sugar|ice|syrup|level|pedas|rasa|pilihan|option)\b/i.test(name.trim()) ||
+                   /^[+\-*•.]\s*/.test(name.trim());
+        };
+
         const isIgnoredRow = (lower) => {
-            return /^[+\-]/.test(lower) || // modifier / discount lines like + Level 1 or -Rp12.000
+            return isHeaderMetadata(lower) ||
+                   /^[+\-]/.test(lower) || // modifier / discount lines like + Level 1 or -Rp12.000
                    /^(dine\s*in|take\s*away|takeaway|order|table|meja|kasir|cashier|server|waiter|waiters|pax|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
                    /^(tax|tex|pb1|pb\s*1|pajak|ppn|service|sc\b|biaya|ongkir|voucher|promo|diskon|discount|rounding)/i.test(lower) ||
-                   /(?:^|\b)(bayar\s*pakai|dibayar|metode\s*pembayaran|payment|paid|mandiri|bca|bni|bri|cimb|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|shopee\s*pay|kembali|kembalian|change)(?:\b|$)/i.test(lower) ||
+                   /(?:^|\b)(bayar\s*pakai|dibayar|metode\s*pembayaran|payment|paid|mandiri|bca|bni|bri|cimb|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|shopee\s*pay|kembali|kembalian|change|gofood_int)(?:\b|$)/i.test(lower) ||
                    /^(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot|total\s*harga)/i.test(lower) ||
                    /^(grand\s*total|total\b|tolal|tota[l1|])/i.test(lower) ||
-                   /^\d+\s*items?\b/i.test(lower) || // e.g. '13 items' in Abuba
+                   /^\d+\s*items?\b/i.test(lower) || // e.g. '13 items' in Abuba or '3 item'
                    /^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(lower) ||
                    /^\d{1,2}:\d{2}/.test(lower);
         };
@@ -176,6 +190,7 @@ const OCR = {
         };
 
         const formatNumber = formatNumberFn || ((num) => new Intl.NumberFormat('id-ID').format(num));
+        let reachedSummaryOrTotals = false;
 
         for (let i = 0; i < rawLines.length; i++) {
             const line = rawLines[i];
@@ -184,8 +199,29 @@ const OCR = {
             if (isDashedOrSeparator(line)) continue;
             if (isStopFooter(lower)) break; // Stop parsing when reaching receipt footer
 
+            // Skip Header PIN / Order ID and numeric PIN line that follows
+            if (isHeaderMetadata(lower)) {
+                if (i + 1 < rawLines.length && /^\d{3,6}$/.test(rawLines[i + 1].trim())) {
+                    i++; // skip numeric PIN code
+                }
+                continue;
+            }
+
+            // Reset boundary if entering itemized section (e.g. 'Rincian transaksi')
+            if (/(?:^|\b)(rincian\s*transaksi|detail\s*transaksi|rincian\s*pesanan|detail\s*pesanan|daftar\s*pesanan|daftar\s*menu)(?:\b|$)/i.test(lower)) {
+                reachedSummaryOrTotals = false;
+                continue;
+            }
+
+            // Summary items count e.g. '3 item' or '13 items' marks the end of menu items list
+            if (/^\d+\s*items?\b/i.test(lower)) {
+                if (items.length > 0) reachedSummaryOrTotals = true;
+                continue;
+            }
+
             // Detect Subtotal (e.g. Subtotal, Sub Total, sb Total, sbtol, Total Harga)
             if (/(?:^|\b)(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot|total\s*pesanan|total\s*menu|total\s*harga|harga\s*makanan)(?:\b|$)/i.test(lower)) {
+                if (items.length > 0) reachedSummaryOrTotals = true;
                 let nums = extractNumbers(line);
                 if (nums.length === 0 && i + 1 < rawLines.length) {
                     nums = extractNumbers(rawLines[i + 1]);
@@ -198,6 +234,7 @@ const OCR = {
 
             // Detect Surcharges (Tax, Service, PB1, PPN, Rounding, Delivery, Ongkir, Fees)
             if (/(?:^|\b)(service|sc\b|svc\b|tax|pb\s*1|pb1|ppn|pajak|restaurant\s*tax|rounding|pembulatan|ongkir|delivery|biaya\s*layanan|biaya\s*jasa|biaya\s*antar|biaya\s*aplikasi)(?:\b|[:\s(])/i.test(lower)) {
+                if (items.length > 0) reachedSummaryOrTotals = true;
                 let nums = extractNumbers(line);
                 if (nums.length === 0 && i + 1 < rawLines.length) {
                     nums = extractNumbers(rawLines[i + 1]);
@@ -211,8 +248,9 @@ const OCR = {
                 continue;
             }
 
-            // Detect Discounts / Promo
-            if (/(?:^|\b)(diskon|discount|promo|potongan|voucher|hemat)(?:\b|[:\s])/i.test(lower)) {
+            // Detect Discounts / Promo (including explicit minus lines like GOFOOD_INT : -14.650)
+            if (isNegativeDiscountLine(line) || /(?:^|\b)(diskon|discount|promo|potongan|voucher|hemat)(?:\b|[:\s])/i.test(lower)) {
+                if (items.length > 0) reachedSummaryOrTotals = true;
                 let nums = extractNumbers(line);
                 if (nums.length === 0 && i + 1 < rawLines.length) {
                     nums = extractNumbers(rawLines[i + 1]);
@@ -229,6 +267,7 @@ const OCR = {
             // Detect Grand Total / Total / Total Pembayaran / Total Dibayar / Due / Amount
             if (/(?:^|\b)(grand\s*total|total\s*bayar|total\s*dibayar|total\s*akhir|total\s*tagihan|total\s*pembayaran|total|tolal|tota[l1|i!]|tot\b|due|amount)(?:\b|[:\s])/i.test(lower)) {
                 if (!lower.includes('item') && !lower.includes('qty') && !lower.includes('porsi') && !lower.includes('diskon')) {
+                    if (items.length > 0) reachedSummaryOrTotals = true;
                     let nums = extractNumbers(line);
                     if (nums.length === 0 && i + 1 < rawLines.length) {
                         nums = extractNumbers(rawLines[i + 1]);
@@ -236,7 +275,6 @@ const OCR = {
                     }
                     if (nums.length > 0) {
                         let tVal = nums[nums.length - 1];
-                        // If tVal < 1000 and next line has 3 digits (e.g. 398 on this line, 500 on next line due to thumb or paper fold)
                         if (tVal < 1000 && i + 1 < rawLines.length) {
                             const nextNums = extractNumbers(rawLines[i + 1]);
                             if (nextNums.length > 0 && nextNums[0] >= 100 && nextNums[0] <= 999) {
@@ -250,6 +288,11 @@ const OCR = {
                 }
             }
 
+            // ONCE SUMMARY / TOTALS REACHED, DO NOT ADD FURTHER FOOD ITEMS!
+            if (reachedSummaryOrTotals) {
+                continue;
+            }
+
             if (isIgnoredRow(lower)) continue;
 
             // Pattern 1: Same-line item (e.g. 'N.Ayam Bakar x2 Rp94.000' or '1 Paket Nasi Ayam... @Rp36.500 Rp36.500')
@@ -257,13 +300,26 @@ const OCR = {
             if (sameLineMatch) {
                 const { name: nameCandidate, qty } = extractQtyAndCleanName(sameLineMatch[1], items.length + 1);
                 const price = parseInt(sameLineMatch[2].replace(/[\.,]/g, ''), 10);
-                if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
-                    items.push({
-                        name: nameCandidate,
-                        price: formatNumber(price),
-                        qty: qty
-                    });
-                    continue;
+                if (nameCandidate.length >= 2 && !isIgnoredRow(nameCandidate.toLowerCase())) {
+                    if (price === 0) continue; // Free modifier / level
+
+                    if (isModifierLine(nameCandidate) && items.length > 0) {
+                        const lastItem = items[items.length - 1];
+                        const cleanMod = nameCandidate.replace(/^[+\-*•.]\s*/, '').trim();
+                        lastItem.name = `${lastItem.name} (+ ${cleanMod})`;
+                        const curPrice = parseInt(String(lastItem.price).replace(/[^0-9]/g, ''), 10) || 0;
+                        lastItem.price = formatNumber(curPrice + price);
+                        continue;
+                    }
+
+                    if (price > 0) {
+                        items.push({
+                            name: nameCandidate,
+                            price: formatNumber(price),
+                            qty: qty
+                        });
+                        continue;
+                    }
                 }
             }
 
@@ -283,14 +339,27 @@ const OCR = {
                             }
                         }
 
-                        if (nameCandidate.length >= 2 && price > 0 && !isIgnoredRow(nameCandidate.toLowerCase())) {
-                            items.push({
-                                name: nameCandidate,
-                                price: formatNumber(price),
-                                qty: qty
-                            });
-                            i++;
-                            continue;
+                        if (nameCandidate.length >= 2 && !isIgnoredRow(nameCandidate.toLowerCase())) {
+                            i++; // consume nextLine
+                            if (price === 0) continue; // Free modifier / level
+
+                            if (isModifierLine(nameCandidate) && items.length > 0) {
+                                const lastItem = items[items.length - 1];
+                                const cleanMod = nameCandidate.replace(/^[+\-*•.]\s*/, '').trim();
+                                lastItem.name = `${lastItem.name} (+ ${cleanMod})`;
+                                const curPrice = parseInt(String(lastItem.price).replace(/[^0-9]/g, ''), 10) || 0;
+                                lastItem.price = formatNumber(curPrice + price);
+                                continue;
+                            }
+
+                            if (price > 0) {
+                                items.push({
+                                    name: nameCandidate,
+                                    price: formatNumber(price),
+                                    qty: qty
+                                });
+                                continue;
+                            }
                         }
                     }
                 }

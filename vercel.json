@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build:css",
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/api/stats",
+      "destination": "https://kvdb.io/Lm8Q83y1s7Tt7Cn41FQvJk/stats"
+    }
+  ]
+}
