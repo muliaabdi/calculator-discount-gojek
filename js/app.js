@@ -744,117 +744,108 @@ function calculator() {
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         },
 
-        // Image receipt export via html2canvas
-        async copyImageReceipt() {
+        // Helper: Generate receipt image Blob and DataURL reliably
+        async generateReceiptBlobOrDataUrl() {
             const el = document.getElementById('receipt-card');
-            if (!el || typeof html2canvas !== 'function') {
-                this.showToast('Fitur gambar belum siap');
-                return;
+            if (!el) throw new Error('Elemen struk tidak ditemukan');
+
+            // 1. Coba gunakan htmlToImage (Mendukung 100% Tailwind v4 OKLCH, color-mix, & modern CSS)
+            if (typeof window.htmlToImage !== 'undefined') {
+                try {
+                    const blob = await window.htmlToImage.toBlob(el, {
+                        quality: 0.95,
+                        pixelRatio: 2.5,
+                        backgroundColor: '#DCF8C6'
+                    });
+                    if (blob) {
+                        return { blob, dataUrl: URL.createObjectURL(blob) };
+                    }
+                } catch (err1) {
+                    console.warn('htmlToImage.toBlob error, trying toPng:', err1);
+                    try {
+                        const dataUrl = await window.htmlToImage.toPng(el, {
+                            pixelRatio: 2.5,
+                            backgroundColor: '#DCF8C6'
+                        });
+                        if (dataUrl) {
+                            const res = await fetch(dataUrl);
+                            const blob = await res.blob();
+                            return { blob, dataUrl };
+                        }
+                    } catch (err2) {
+                        console.warn('htmlToImage.toPng fallback error:', err2);
+                    }
+                }
             }
-            this.copyingImage = true;
-            try {
-                const h2cOptions = {
-                    scale: 3,
+
+            // 2. Fallback ke html2canvas jika htmlToImage tidak siap
+            if (typeof html2canvas === 'function') {
+                const canvas = await html2canvas(el, {
+                    scale: 2.5,
                     backgroundColor: '#DCF8C6',
                     useCORS: true,
-                    logging: false,
-                    scrollY: 0,
-                    scrollX: 0,
-                    onclone: (clonedDoc) => {
-                        const clonedEl = clonedDoc.getElementById('receipt-card');
-                        if (clonedEl) {
-                            clonedEl.style.overflow = 'visible';
-                            let parent = clonedEl.parentElement;
-                            while (parent && parent !== clonedDoc.body) {
-                                parent.style.overflow = 'visible';
-                                parent.style.maxHeight = 'none';
-                                parent.style.height = 'auto';
-                                parent = parent.parentElement;
-                            }
-                        }
-                    }
-                };
-                const canvas = await html2canvas(el, h2cOptions);
+                    logging: false
+                });
+                const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+                return { blob, dataUrl: canvas.toDataURL('image/png') };
+            }
 
-                canvas.toBlob(async (blob) => {
-                    if (!blob) {
-                        this.showToast('Gagal memproses gambar');
-                        this.copyingImage = false;
-                        return;
-                    }
+            throw new Error('Pustaka pembuat gambar belum siap');
+        },
+
+        // Image receipt export via htmlToImage (with fallback)
+        async copyImageReceipt() {
+            this.copyingImage = true;
+            try {
+                const { blob, dataUrl } = await this.generateReceiptBlobOrDataUrl();
+                let copiedToClipboard = false;
+
+                if (navigator.clipboard && window.ClipboardItem && navigator.clipboard.write) {
                     try {
-                        if (navigator.clipboard && window.ClipboardItem && navigator.clipboard.write) {
-                            await navigator.clipboard.write([
-                                new ClipboardItem({ 'image/png': blob })
-                            ]);
-                            this.showToast('Gambar struk tersalin! Paste (Ctrl+V) langsung di WA');
-                        } else {
-                            const link = document.createElement('a');
-                            link.download = 'struk-patungan.png';
-                            link.href = canvas.toDataURL('image/png');
-                            link.click();
-                            this.showToast('Gambar struk diunduh ke galeri/file');
-                        }
-                        if (typeof confetti === 'function') {
-                            confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
-                        }
-                    } catch (err) {
-                        const link = document.createElement('a');
-                        link.download = 'struk-patungan.png';
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                        this.showToast('Gambar struk diunduh!');
-                    } finally {
-                        this.copyingImage = false;
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        copiedToClipboard = true;
+                        this.showToast('Gambar struk tersalin! Paste (Ctrl+V) langsung di WA');
+                    } catch (clipErr) {
+                        console.warn('Clipboard write image failed, falling back to download:', clipErr);
                     }
-                }, 'image/png');
+                }
+
+                if (!copiedToClipboard) {
+                    const link = document.createElement('a');
+                    link.download = 'struk-patungan.png';
+                    link.href = dataUrl;
+                    link.click();
+                    this.showToast('Gambar struk diunduh ke galeri/file');
+                }
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+                }
             } catch (err) {
-                console.error(err);
-                this.copyingImage = false;
+                console.error('Error copyImageReceipt:', err);
                 this.showToast('Gagal membuat gambar struk');
+            } finally {
+                this.copyingImage = false;
             }
         },
+
         async downloadImageReceipt() {
-            const el = document.getElementById('receipt-card');
-            if (!el || typeof html2canvas !== 'function') {
-                this.showToast('Fitur gambar belum siap');
-                return;
-            }
             this.copyingImage = true;
             try {
-                const h2cOptions = {
-                    scale: 3,
-                    backgroundColor: '#DCF8C6',
-                    useCORS: true,
-                    logging: false,
-                    scrollY: 0,
-                    scrollX: 0,
-                    onclone: (clonedDoc) => {
-                        const clonedEl = clonedDoc.getElementById('receipt-card');
-                        if (clonedEl) {
-                            clonedEl.style.overflow = 'visible';
-                            let parent = clonedEl.parentElement;
-                            while (parent && parent !== clonedDoc.body) {
-                                parent.style.overflow = 'visible';
-                                parent.style.maxHeight = 'none';
-                                parent.style.height = 'auto';
-                                parent = parent.parentElement;
-                            }
-                        }
-                    }
-                };
-                const canvas = await html2canvas(el, h2cOptions);
+                const { dataUrl } = await this.generateReceiptBlobOrDataUrl();
                 const link = document.createElement('a');
                 link.download = 'struk-patungan.png';
-                link.href = canvas.toDataURL('image/png');
+                link.href = dataUrl;
                 link.click();
                 this.showToast('Gambar struk berhasil diunduh!');
                 if (typeof confetti === 'function') {
                     confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
                 }
             } catch (err) {
-                console.error(err);
-                this.showToast('Gagal mengunduh gambar');
+                console.error('Error downloadImageReceipt:', err);
+                this.showToast('Gagal mengunduh gambar struk');
             } finally {
                 this.copyingImage = false;
             }
