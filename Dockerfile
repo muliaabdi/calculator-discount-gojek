@@ -10,7 +10,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html /usr/share/nginx/html/
 COPY css/ /usr/share/nginx/html/css/
 COPY js/ /usr/share/nginx/html/js/
-COPY favicon.svg favicon.ico favicon-16.png favicon-32.png favicon-192.png apple-touch-icon.png logo.svg /usr/share/nginx/html/
+COPY favicon.svg favicon.ico favicon-16.png favicon-32.png favicon-192.png apple-touch-icon.png logo.svg robots.txt sitemap.xml /usr/share/nginx/html/
 
 # Expose HTTP port
 EXPOSE 80
