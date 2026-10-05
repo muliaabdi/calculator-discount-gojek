@@ -7,7 +7,8 @@ function calculator() {
     const LANG_KEY = 'bagi_promo_lang';
     const STATS_KEY = 'bagi_promo_lifetime_stats';
     const KV_BUCKET = 'Lm8Q83y1s7Tt7Cn41FQvJk';
-    const KV_URL = `https://kvdb.io/${KV_BUCKET}/stats`;
+    const isProduction = typeof window !== 'undefined' && window.location.hostname === 'calculator.muliaabdi.net';
+    const KV_URL = isProduction ? '/api/stats' : `https://kvdb.io/${KV_BUCKET}/stats`;
 
     return {
         lang: 'id',
@@ -27,6 +28,7 @@ function calculator() {
             count: 1
         },
         showShareModal: false,
+        showFaqModal: false,
         shareTab: 'link',
         copied: false,
         linkCopied: false,
