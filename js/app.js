@@ -744,44 +744,247 @@ function calculator() {
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         },
 
+        // Native 2D Canvas Renderer (Zero-dependency, bulletproof on all mobile/desktop browsers)
+        renderReceiptWithNativeCanvas() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const dpr = Math.min(window.devicePixelRatio || 2, 3);
+            const width = 420;
+
+            function roundRect(c, x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                c.beginPath();
+                c.moveTo(x + r, y);
+                c.arcTo(x + w, y, x + w, y + h, r);
+                c.arcTo(x + w, y + h, x, y + h, r);
+                c.arcTo(x, y + h, x, y, r);
+                c.arcTo(x, y, x + w, y, r);
+                c.closePath();
+            }
+
+            const persons = this.activePersons;
+            let estimatedHeight = 220 + (persons.length * 68) + 50 + 40;
+            if (this.state.payment_info) estimatedHeight += 55;
+
+            canvas.width = width * dpr;
+            canvas.height = estimatedHeight * dpr;
+            ctx.scale(dpr, dpr);
+
+            // 1. Background Kartu Struk (#DCF8C6)
+            ctx.fillStyle = '#DCF8C6';
+            roundRect(ctx, 0, 0, width, estimatedHeight, 18);
+            ctx.fill();
+            ctx.strokeStyle = '#a7f3d0';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            let curY = 24;
+            const padX = 18;
+            const contentW = width - (padX * 2);
+
+            // 2. Header
+            ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif, system-ui';
+            ctx.fillStyle = '#064e3b';
+            ctx.fillText('📄 ' + (this.t('receiptHeader') || 'RINCIAN PATUNGAN MAKANAN'), padX, curY);
+            curY += 14;
+
+            ctx.strokeStyle = 'rgba(5, 150, 105, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padX, curY);
+            ctx.lineTo(width - padX, curY);
+            ctx.stroke();
+            curY += 14;
+
+            // 3. Ringkasan Tagihan Box
+            const sumBoxH = 88;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+            roundRect(ctx, padX, curY, contentW, sumBoxH, 12);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(5, 150, 105, 0.15)';
+            ctx.stroke();
+
+            ctx.font = '500 11px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText(this.t('billSummary') || 'Ringkasan Tagihan:', padX + 12, curY + 20);
+
+            // Total Menu
+            ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#334155';
+            ctx.fillText(this.t('menuTotal') || 'Total Menu:', padX + 12, curY + 38);
+            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('Rp ' + this.formatNumber(this.parsedTotalPrice || 0), width - padX - 12, curY + 38);
+
+            // Total Akhir Dibayar
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#065f46';
+            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.fillText(this.t('totalPaid') || '2. Total Akhir Dibayar', padX + 12, curY + 56);
+            ctx.textAlign = 'right';
+            ctx.fillText('Rp ' + this.formatNumber(this.parsedTotalAmount || 0), width - padX - 12, curY + 56);
+
+            // Diskon / Surcharge
+            ctx.textAlign = 'left';
+            if (!this.isSurchargeMode) {
+                ctx.fillStyle = '#008f10';
+                ctx.fillText(this.t('discountSaving') || 'Total Penghematan Diskon', padX + 12, curY + 74);
+                ctx.textAlign = 'right';
+                ctx.fillText('Rp ' + this.formatNumber(this.totalDiscountAmount || 0) + ' (' + (this.discountPercentage || 0) + '% OFF)', width - padX - 12, curY + 74);
+            } else {
+                ctx.fillStyle = '#b45309';
+                ctx.fillText(this.t('taxAndService') || 'Pajak & Service', padX + 12, curY + 74);
+                ctx.textAlign = 'right';
+                ctx.fillText('+Rp ' + this.formatNumber(this.totalSurchargeAmount || 0) + ' (+' + (this.surchargePercentage || 0) + '%)', width - padX - 12, curY + 74);
+            }
+            ctx.textAlign = 'left';
+            curY += sumBoxH + 14;
+
+            // 4. Heading Rincian Bayar per Orang
+            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#1e293b';
+            ctx.fillText(this.t('breakdownPerPerson') || 'Rincian Bayar per Orang:', padX, curY);
+            curY += 8;
+
+            // 5. Items Per Person
+            for (let idx = 0; idx < persons.length; idx++) {
+                const p = persons[idx];
+                const cardH = 58;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+                roundRect(ctx, padX, curY, contentW, cardH, 12);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(226, 232, 240, 0.8)';
+                ctx.stroke();
+
+                ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#0f172a';
+                const pName = (idx + 1) + '. ' + (p.name || ('Orang ' + (idx + 1)));
+                const truncatedName = pName.length > 28 ? pName.slice(0, 26) + '...' : pName;
+                ctx.fillText(truncatedName, padX + 10, curY + 22);
+
+                ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#047857';
+                ctx.textAlign = 'right';
+                ctx.fillText('Rp ' + this.formatNumber(this.calculatePersonShare(p)), width - padX - 10, curY + 22);
+
+                ctx.textAlign = 'left';
+                ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#64748b';
+                ctx.fillText((this.t('menuPrice') || 'Harga Menu:') + ' Rp ' + this.formatNumber(p.price || 0), padX + 10, curY + 42);
+
+                ctx.textAlign = 'right';
+                if (!this.isSurchargeMode) {
+                    ctx.fillStyle = '#059669';
+                    ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillText((this.t('saved') || 'Hemat') + ': Rp ' + this.formatNumber(this.calculatePersonSaving(p)), width - padX - 10, curY + 42);
+                } else {
+                    ctx.fillStyle = '#b45309';
+                    ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillText((this.t('extraCharge') || 'Ekstra') + ': +Rp ' + this.formatNumber(this.calculatePersonExtra(p)), width - padX - 10, curY + 42);
+                }
+                ctx.textAlign = 'left';
+
+                curY += cardH + 7;
+            }
+
+            curY += 4;
+
+            // 6. TOTAL DITAGIH Box
+            const totBoxH = 38;
+            ctx.fillStyle = '#059669';
+            roundRect(ctx, padX, curY, contentW, totBoxH, 10);
+            ctx.fill();
+
+            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(this.t('totalBilled') || 'TOTAL DITAGIH', padX + 12, curY + 24);
+
+            ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('Rp ' + this.formatNumber(this.totalAllocatedShare || 0), width - padX - 12, curY + 24);
+            ctx.textAlign = 'left';
+            curY += totBoxH + 10;
+
+            // 7. Info Pembayaran Box (jika ada)
+            if (this.state.payment_info) {
+                const payBoxH = 46;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+                roundRect(ctx, padX, curY, contentW, payBoxH, 10);
+                ctx.fill();
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.stroke();
+
+                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#334155';
+                ctx.fillText(this.t('paymentTransfer') || 'Info Pembayaran / Transfer:', padX + 10, curY + 18);
+
+                ctx.font = '11px monospace, "Plus Jakarta Sans"';
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText(this.state.payment_info.slice(0, 45), padX + 10, curY + 34);
+
+                curY += payBoxH + 10;
+            }
+
+            // 8. Footer Struk
+            ctx.strokeStyle = 'rgba(5, 150, 105, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(padX, curY);
+            ctx.lineTo(width - padX, curY);
+            ctx.stroke();
+            curY += 14;
+
+            ctx.font = '500 10.5px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#475569';
+            ctx.fillText('🔗 ' + (this.t('calculatedVia') || 'Dihitung via:') + ' https://calculator.muliaabdi.net', padX, curY);
+
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText((this.currentClock || '00:00') + ' ', width - padX - 14, curY);
+            ctx.fillStyle = '#0284c7';
+            ctx.fillText('✓✓', width - padX, curY);
+            ctx.textAlign = 'left';
+
+            return canvas;
+        },
+
         // Helper: Generate receipt image Blob and DataURL reliably
         async generateReceiptBlobOrDataUrl() {
             const el = document.getElementById('receipt-card');
-            if (!el) throw new Error('Elemen struk tidak ditemukan');
 
-            // 1. Coba gunakan htmlToImage (Mendukung 100% Tailwind v4 OKLCH, color-mix, & modern CSS)
-            if (typeof window.htmlToImage !== 'undefined') {
+            // 1. Coba gunakan htmlToImage dengan skipFonts: true (tidak terblokir CORS Google Fonts)
+            if (el && typeof window.htmlToImage !== 'undefined') {
                 try {
                     const blob = await window.htmlToImage.toBlob(el, {
                         quality: 0.95,
                         pixelRatio: 2.5,
+                        skipFonts: true,
+                        fontEmbedCSS: '',
                         backgroundColor: '#DCF8C6'
                     });
                     if (blob) {
                         return { blob, dataUrl: URL.createObjectURL(blob) };
                     }
                 } catch (err1) {
-                    console.warn('htmlToImage.toBlob error, trying toPng:', err1);
-                    try {
-                        const dataUrl = await window.htmlToImage.toPng(el, {
-                            pixelRatio: 2.5,
-                            backgroundColor: '#DCF8C6'
-                        });
-                        if (dataUrl) {
-                            const res = await fetch(dataUrl);
-                            const blob = await res.blob();
-                            return { blob, dataUrl };
-                        }
-                    } catch (err2) {
-                        console.warn('htmlToImage.toPng fallback error:', err2);
-                    }
+                    console.warn('htmlToImage toBlob failed, falling back to native canvas:', err1);
                 }
             }
 
-            // 2. Fallback ke html2canvas jika htmlToImage tidak siap
-            if (typeof html2canvas === 'function') {
+            // 2. Fallback Utama: Native 2D Canvas (100% selalu berhasil & independen dari stylesheet)
+            try {
+                const canvas = this.renderReceiptWithNativeCanvas();
+                const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+                if (blob) {
+                    return { blob, dataUrl: URL.createObjectURL(blob) };
+                }
+            } catch (err2) {
+                console.warn('Native canvas receipt generation failed:', err2);
+            }
+
+            // 3. Fallback alternatif: html2canvas
+            if (el && typeof html2canvas === 'function') {
                 const canvas = await html2canvas(el, {
-                    scale: 2.5,
+                    scale: 2,
                     backgroundColor: '#DCF8C6',
                     useCORS: true,
                     logging: false
