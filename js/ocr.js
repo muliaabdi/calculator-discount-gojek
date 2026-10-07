@@ -106,11 +106,12 @@ const OCR = {
 
         const isStopFooter = (lower) => {
             return /^(detail\s*pengantaran|kontak\s*gojek|tentang\s*gofood|bantuan|laporkan\s*masalah)/i.test(lower) ||
-                   /^(terima\s*kasih|thank\s*you|hatur\s*nuhun|matur\s*nuwun|kunjungan)/i.test(lower);
+                   /^(terima\s*kasih|thank\s*you|hatur\s*nuhun|matur\s*nuwun|kunjungan|closed\b)/i.test(lower) ||
+                   /\bclosed\s+\d{1,2}\s+[a-z]{3}\b/i.test(lower);
         };
 
         const isHeaderMetadata = (lower) => {
-            return /(?:^|\b)(pin\b|gofood\s*pin|otp\b|order\s*id|transaksi|trans\s*id|antrian|queue|no\s*struk|no\s*order|pickup\s*code|check\s*in)/i.test(lower);
+            return /(?:^|\b)(pin\b|gofood\s*pin|otp\b|order\s*id|transaksi|trans\s*id|antrian|queue|no\s*struk|no\s*order|pickup\s*code|check\s*in|pos\s*\d*|reg\s*\d*|cashier|kasir|server|waiter|terminal|closed\b|lantai\s*\d+|mall\b|cabang\b|outlet\b)(?:\b|$)/i.test(lower);
         };
 
         const isNegativeDiscountLine = (str) => {
@@ -125,26 +126,28 @@ const OCR = {
         const isIgnoredRow = (lower) => {
             return isHeaderMetadata(lower) ||
                    /^[+\-]/.test(lower) || // modifier / discount lines like + Level 1 or -Rp12.000
-                   /^(dine\s*in|take\s*away|takeaway|order|table|meja|kasir|cashier|server|waiter|waiters|pax|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
+                   /^(dine\s*in|take\s*away|takeaway|bungkus|makan\s*di\s*tempat|order|table|meja|kasir|cashier|server|waiter|waiters|pax|tgl|tanggal|date|waktu|jam|bill|receipt|no\.|no\s*:|nota)/i.test(lower) ||
                    /^(tax|tex|pb1|pb\s*1|pajak|ppn|service|sc\b|biaya|ongkir|voucher|promo|diskon|discount|rounding)/i.test(lower) ||
-                   /(?:^|\b)(bayar\s*pakai|dibayar|metode\s*pembayaran|payment|paid|mandiri|bca|bni|bri|cimb|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|shopee\s*pay|kembali|kembalian|change|gofood_int)(?:\b|$)/i.test(lower) ||
+                   /(?:^|\b)(bayar\s*pakai|dibayar|metode\s*pembayaran|payment|paid|mandiri|bca|bni|bri|cimb|debit|kredit|credit|qris|tunai|cash|gopay|ovo|dana|shopeepay|shopee\s*pay|tcash|kembali|kembalian|change|gofood_int)(?:\b|$)/i.test(lower) ||
                    /^(sub\s*total|sb\s*total|sbtol|sbtl|subttl|sub-total|sub\s*tot|sb\s*tot|total\s*harga)/i.test(lower) ||
                    /^(grand\s*total|total\b|tolal|tota[l1|])/i.test(lower) ||
                    /^\d+\s*items?\b/i.test(lower) || // e.g. '13 items' in Abuba or '3 item'
                    /^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(lower) ||
+                   /^\d{1,2}\s+[a-z]{3}\s+\d{2,4}/i.test(lower) ||
                    /^\d{1,2}:\d{2}/.test(lower);
         };
 
         const isQtyPriceLine = (line) => {
             const trimmed = line.trim();
             return /^(?:[0-9tiI|]+[\s\.\,]*x|x\s*\d+|[0-9tiI|]+\s*@|@\s*rp\.?\s*\d+|\d+\s*pcs|\d+\s*porsi|\d+\s+\d{1,3}[\.,]\d{3}|\d{1,3}[\.,]\d{3}\s*x)/i.test(trimmed) ||
-                   /^[0-9tiI|\s\.xX@\,]+$/.test(trimmed);
+                   /^(?:rp\.?\s*)?\d{1,3}[\.,]\d{3}$/i.test(trimmed);
         };
 
         const cleanItemName = (name, fallbackIdx) => {
             let clean = name
+                .replace(/^[!|\\\/]+\s*/, '')
                 .replace(/^[\d\s\.\-xX•*#\[\]\(\)]+/, '')
-                .replace(/@[a-zA-Z0-9_\.]+/g, '')
+                .replace(/@[^\s]+/g, '')
                 .replace(/^[£$]5\s+/i, 'ES ')
                 .replace(/^e5\s+/i, 'ES ')
                 .replace(/[\.\:,\|\-_@\s]+$/, '')
@@ -159,22 +162,35 @@ const OCR = {
             let text = rawText.trim();
             let qty = 1;
 
+            // OCR symbol artifact for 1 (e.g. '! L-Ori Beef' or '| L-Ori Beef')
+            if (/^[!|lI]\s+[a-zA-Z]/.test(text)) {
+                qty = 1;
+                text = text.replace(/^[!|lI]\s+/, '');
+            }
+
             // 1. Trailing Qty pattern: e.g. "N. Ayam Bakar x2", "N. Ayam Bakar x 2", "2x", "2 pcs", "2 porsi", "qty 2", "qty: 2"
             const trailingMatch = text.match(/(?:\s+|[\-=_])(?:x\s*(\d{1,2})|(\d{1,2})\s*x|qty\s*[:\.]?\s*(\d{1,2})|(\d{1,2})\s*(?:pcs|pc|porsi|cup|btl|ptg|bh|paket))\s*$/i);
             if (trailingMatch) {
                 qty = parseInt(trailingMatch[1] || trailingMatch[2] || trailingMatch[3] || trailingMatch[4], 10) || 1;
                 text = text.slice(0, trailingMatch.index).trim();
             } else {
-                // 2. Leading Qty pattern: e.g. "2x Ayam Bakar", "2 x Ayam Bakar", "2pcs Ayam Bakar"
+                // 2. Leading Qty pattern with unit: e.g. "2x Ayam Bakar", "2 x Ayam Bakar", "2pcs Ayam Bakar"
                 const leadingMatch = text.match(/^(\d{1,2})\s*(?:x|pcs|pc|porsi|cup|btl|ptg|bh|paket)\s+/i);
                 if (leadingMatch) {
                     qty = parseInt(leadingMatch[1], 10) || 1;
                     text = text.slice(leadingMatch[0].length).trim();
+                } else {
+                    // 3. Leading plain integer Qty: e.g. "2  Ocha Cold", "1  Karaage"
+                    const leadingPlainMatch = text.match(/^(\d{1,2})\s+([a-zA-Z].+)/);
+                    if (leadingPlainMatch && !/^1\/[24]/.test(text)) {
+                        qty = parseInt(leadingPlainMatch[1], 10) || 1;
+                        text = leadingPlainMatch[2].trim();
+                    }
                 }
             }
 
-            // 3. Inline @ pricing: e.g. "2 @ 47.000" or "@ 47.000"
-            const atMatch = text.match(/(?:^|\s+)(?:(\d{1,2})\s*)?@\s*(?:rp\.?\s*)?[\d\.,]+/i);
+            // 4. Inline @ pricing: e.g. "2 @ 47.000" or "@ 47.000" or "@9,09D"
+            const atMatch = text.match(/(?:^|\s+)(?:(\d{1,2})\s*)?@\s*(?:rp\.?\s*)?[\d\.,oODbB]+/i);
             if (atMatch) {
                 if (atMatch[1]) {
                     qty = parseInt(atMatch[1], 10) || qty;
@@ -199,16 +215,26 @@ const OCR = {
             if (isDashedOrSeparator(line)) continue;
             if (isStopFooter(lower)) break; // Stop parsing when reaching receipt footer
 
+            // Skip standalone date lines like "29 Oct 17 15:18:51"
+            if (/^\d{1,2}\s+[a-z]{3}\s+\d{2,4}\s+\d{1,2}:\d{2}/i.test(lower)) continue;
+
             // Skip Header PIN / Order ID and numeric PIN line that follows
             if (isHeaderMetadata(lower)) {
-                if (i + 1 < rawLines.length && /^\d{3,6}$/.test(rawLines[i + 1].trim())) {
+                if (i + 1 < rawLines.length && /^\d{3,8}$/.test(rawLines[i + 1].trim())) {
                     i++; // skip numeric PIN code
                 }
                 continue;
             }
 
-            // Reset boundary if entering itemized section (e.g. 'Rincian transaksi')
-            if (/(?:^|\b)(rincian\s*transaksi|detail\s*transaksi|rincian\s*pesanan|detail\s*pesanan|daftar\s*pesanan|daftar\s*menu)(?:\b|$)/i.test(lower)) {
+            // Skip standalone 4-8 digit receipt/invoice number preceding a date timestamp
+            if (/^\d{4,8}$/.test(line.trim()) && i + 1 < rawLines.length && /^\d{1,2}\s+[a-z]{3}/i.test(rawLines[i + 1].trim())) {
+                continue;
+            }
+
+            // Reset boundary if entering itemized section (e.g. 'Dine In', 'Take Away', 'Rincian transaksi')
+            if (/(?:^|\b)(dine\s*in|take\s*away|takeaway|bungkus|makan\s*di\s*tempat|rincian\s*transaksi|detail\s*transaksi|rincian\s*pesanan|detail\s*pesanan|daftar\s*pesanan|daftar\s*menu)(?:\b|$)/i.test(lower)) {
+                // Clear any false positive items detected above order section header
+                if (items.length > 0) items.length = 0;
                 reachedSummaryOrTotals = false;
                 continue;
             }
@@ -295,14 +321,17 @@ const OCR = {
 
             if (isIgnoredRow(lower)) continue;
 
-            // Pattern 1: Same-line item (e.g. 'N.Ayam Bakar x2 Rp94.000' or '1 Paket Nasi Ayam... @Rp36.500 Rp36.500')
-            const sameLineMatch = line.match(/^(.+?)(?:\s+|[\.:\-_=]+)\s*(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{3,8})$/i);
+            // Skip standalone numbers in summary without item name
+            if (/^\s*(?:rp\.?\s*)?[\d\.,]+\s*$/.test(line)) {
+                continue;
+            }
+
+            // Pattern 1: Same-line item (e.g. 'N.Ayam Bakar x2 Rp94.000' or '1 Karaage 20,909' or '1 R-Yaki Beef 0')
+            const sameLineMatch = line.match(/^(.+?)(?:\s+|[\.:\-_=]+)\s*(?:rp\.?\s*)?(\d{1,3}(?:[\.,]\d{3})+|\d{1,8})$/i);
             if (sameLineMatch) {
                 const { name: nameCandidate, qty } = extractQtyAndCleanName(sameLineMatch[1], items.length + 1);
                 const price = parseInt(sameLineMatch[2].replace(/[\.,]/g, ''), 10);
                 if (nameCandidate.length >= 2 && !isIgnoredRow(nameCandidate.toLowerCase())) {
-                    if (price === 0) continue; // Free modifier / level
-
                     if (isModifierLine(nameCandidate) && items.length > 0) {
                         const lastItem = items[items.length - 1];
                         const cleanMod = nameCandidate.replace(/^[+\-*•.]\s*/, '').trim();
@@ -312,14 +341,12 @@ const OCR = {
                         continue;
                     }
 
-                    if (price > 0) {
-                        items.push({
-                            name: nameCandidate,
-                            price: formatNumber(price),
-                            qty: qty
-                        });
-                        continue;
-                    }
+                    items.push({
+                        name: nameCandidate,
+                        price: formatNumber(price),
+                        qty: qty
+                    });
+                    continue;
                 }
             }
 
@@ -341,7 +368,6 @@ const OCR = {
 
                         if (nameCandidate.length >= 2 && !isIgnoredRow(nameCandidate.toLowerCase())) {
                             i++; // consume nextLine
-                            if (price === 0) continue; // Free modifier / level
 
                             if (isModifierLine(nameCandidate) && items.length > 0) {
                                 const lastItem = items[items.length - 1];
@@ -352,14 +378,12 @@ const OCR = {
                                 continue;
                             }
 
-                            if (price > 0) {
-                                items.push({
-                                    name: nameCandidate,
-                                    price: formatNumber(price),
-                                    qty: qty
-                                });
-                                continue;
-                            }
+                            items.push({
+                                name: nameCandidate,
+                                price: formatNumber(price),
+                                qty: qty
+                            });
+                            continue;
                         }
                     }
                 }
